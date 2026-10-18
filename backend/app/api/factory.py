@@ -7,18 +7,19 @@ from app import __version__
 from app.api.routes import router
 from app.api.services import Services, build_services
 
-# Origins of the local React dev server.
+# Origins of the local React dev server. Deployed origins come from CORS_ORIGINS.
 ALLOWED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
 
 
 def create_app(services: Services | None = None) -> FastAPI:
+    services = services or build_services()
     app = FastAPI(title="Agent Model Router", version=__version__)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=ALLOWED_ORIGINS,
+        allow_origins=[*ALLOWED_ORIGINS, *services.settings.cors_origin_list],
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    app.state.services = services or build_services()
+    app.state.services = services
     app.include_router(router)
     return app
