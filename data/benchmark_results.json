@@ -1,0 +1,369 @@
+{
+  "config": {
+    "n_tasks": 1000,
+    "repeats": 5,
+    "seed": 0,
+    "judge_detect_rate": 0.85,
+    "judge_false_reject_rate": 0.03,
+    "judge_tier": "mid",
+    "quality_target": 0.93,
+    "floor_grid": [
+      0.6,
+      0.7,
+      0.8,
+      0.9
+    ],
+    "validation_repeats": 2,
+    "bootstrap_resamples": 2000
+  },
+  "split_sizes": {
+    "train": 390,
+    "validation": 195,
+    "test": 415
+  },
+  "chosen_low_floor": 0.6,
+  "validation": [
+    {
+      "low_floor": 0.6,
+      "success_rate": 0.9538461538461539,
+      "cost_per_success_usd": 0.0007342983870967743
+    },
+    {
+      "low_floor": 0.7,
+      "success_rate": 0.9641025641025641,
+      "cost_per_success_usd": 0.0007966606382978714
+    },
+    {
+      "low_floor": 0.8,
+      "success_rate": 0.9615384615384616,
+      "cost_per_success_usd": 0.0008264543999999991
+    },
+    {
+      "low_floor": 0.9,
+      "success_rate": 0.9435897435897436,
+      "cost_per_success_usd": 0.0010444673913043486
+    }
+  ],
+  "scorecards": {
+    "fixed_cheap": {
+      "strategy": "fixed_cheap",
+      "n": 2075,
+      "success_rate": 0.68,
+      "success_ci": [
+        0.6596118194391967,
+        0.6997229177529012
+      ],
+      "total_cost_usd": 0.01777150000000004,
+      "cost_per_success_usd": 1.2594968107725047e-05,
+      "mean_latency_s": 0.3561638554216883,
+      "escalation_rate": 0.0,
+      "abstain_rate": 0.0,
+      "false_acceptance_rate": 0.32
+    },
+    "fixed_strongest": {
+      "strategy": "fixed_strongest",
+      "n": 2075,
+      "success_rate": 0.9749397590361446,
+      "success_ci": [
+        0.9672856719263248,
+        0.9808385141588489
+      ],
+      "total_cost_usd": 1.5588500000000012,
+      "cost_per_success_usd": 0.0007705635195254579,
+      "mean_latency_s": 1.3580120481927545,
+      "escalation_rate": 0.0,
+      "abstain_rate": 0.0,
+      "false_acceptance_rate": 0.02506024096385542
+    },
+    "complexity_only": {
+      "strategy": "complexity_only",
+      "n": 2075,
+      "success_rate": 0.8486746987951808,
+      "success_ci": [
+        0.8326115385377618,
+        0.86344919066835
+      ],
+      "total_cost_usd": 0.9234830000000026,
+      "cost_per_success_usd": 0.000524408290743897,
+      "mean_latency_s": 0.82298192771084,
+      "escalation_rate": 0.0,
+      "abstain_rate": 0.0,
+      "false_acceptance_rate": 0.15132530120481927
+    },
+    "router_cold_start": {
+      "strategy": "router_cold_start",
+      "n": 2075,
+      "success_rate": 0.971566265060241,
+      "success_ci": [
+        0.9634969479812706,
+        0.9778927182636229
+      ],
+      "total_cost_usd": 1.5801979999999982,
+      "cost_per_success_usd": 0.0007838283730158722,
+      "mean_latency_s": 1.53609036144578,
+      "escalation_rate": 0.08,
+      "abstain_rate": 0.02120481927710849,
+      "false_acceptance_rate": 0.007385524372230428
+    },
+    "router_learned": {
+      "strategy": "router_learned",
+      "n": 2075,
+      "success_rate": 0.9710843373493976,
+      "success_ci": [
+        0.9629579359907621,
+        0.9774696559912341
+      ],
+      "total_cost_usd": 1.429105000000006,
+      "cost_per_success_usd": 0.0007092332506203504,
+      "mean_latency_s": 1.4211317269076447,
+      "escalation_rate": 0.1344578313253012,
+      "abstain_rate": 0.01927710843373498,
+      "false_acceptance_rate": 0.009828009828009828
+    }
+  },
+  "comparisons": [
+    {
+      "a": "router_learned",
+      "b": "fixed_cheap",
+      "a_only": 144,
+      "b_only": 3,
+      "mcnemar_p": 5.936393551939367e-39,
+      "success_diff": 0.29108433734939754,
+      "success_diff_ci": [
+        0.26265060240963845,
+        0.32048192771084294
+      ],
+      "cost_per_success_diff": 0.0006966382825126224,
+      "cost_per_success_diff_ci": [
+        0.0006434299729935015,
+        0.0007507645826767505
+      ]
+    },
+    {
+      "a": "router_learned",
+      "b": "fixed_strongest",
+      "a_only": 5,
+      "b_only": 8,
+      "mcnemar_p": 0.5810546875,
+      "success_diff": -0.003855421686746685,
+      "success_diff_ci": [
+        -0.012530120481927587,
+        0.005301204819276872
+      ],
+      "cost_per_success_diff": -6.133026890510972e-05,
+      "cost_per_success_diff_ci": [
+        -0.0001057687226108131,
+        -1.6685443050500266e-05
+      ]
+    },
+    {
+      "a": "router_learned",
+      "b": "complexity_only",
+      "a_only": 64,
+      "b_only": 7,
+      "mcnemar_p": 1.2596743309903347e-12,
+      "success_diff": 0.12240963855421694,
+      "success_diff_ci": [
+        0.09783132530120453,
+        0.1489156626506033
+      ],
+      "cost_per_success_diff": 0.00018482495987645305,
+      "cost_per_success_diff_ci": [
+        0.00012760377460301216,
+        0.00024229256204035975
+      ]
+    },
+    {
+      "a": "router_learned",
+      "b": "router_cold_start",
+      "a_only": 1,
+      "b_only": 2,
+      "mcnemar_p": 1.0,
+      "success_diff": -0.00048192771084321073,
+      "success_diff_ci": [
+        -0.005783132530120416,
+        0.00481927710843344
+      ],
+      "cost_per_success_diff": -7.459512239552514e-05,
+      "cost_per_success_diff_ci": [
+        -9.700668874299749e-05,
+        -5.155859993259844e-05
+      ]
+    }
+  ],
+  "by_category": {
+    "fixed_cheap": {
+      "coding": {
+        "success_rate": 0.44819277108433736,
+        "cost_per_success_usd": 1.3524193548387122e-05
+      },
+      "extraction": {
+        "success_rate": 0.8819277108433735,
+        "cost_per_success_usd": 6.02185792349726e-06
+      },
+      "reasoning": {
+        "success_rate": 0.5445783132530121,
+        "cost_per_success_usd": 1.3942477876106224e-05
+      },
+      "summarization": {
+        "success_rate": 0.8024096385542169,
+        "cost_per_success_usd": 8.791291291291292e-06
+      },
+      "tool_use": {
+        "success_rate": 0.7228915662650602,
+        "cost_per_success_usd": 2.324499999999998e-05
+      }
+    },
+    "fixed_strongest": {
+      "coding": {
+        "success_rate": 0.9518072289156626,
+        "cost_per_success_usd": 0.0004068354430379752
+      },
+      "extraction": {
+        "success_rate": 0.9879518072289156,
+        "cost_per_success_usd": 0.0004782926829268288
+      },
+      "reasoning": {
+        "success_rate": 0.983132530120482,
+        "cost_per_success_usd": 0.0005487745098039237
+      },
+      "summarization": {
+        "success_rate": 0.9783132530120482,
+        "cost_per_success_usd": 0.0006190886699507394
+      },
+      "tool_use": {
+        "success_rate": 0.9734939759036144,
+        "cost_per_success_usd": 0.0017990099009901014
+      }
+    },
+    "complexity_only": {
+      "coding": {
+        "success_rate": 0.44819277108433736,
+        "cost_per_success_usd": 1.3524193548387122e-05
+      },
+      "extraction": {
+        "success_rate": 0.946987951807229,
+        "cost_per_success_usd": 7.283969465648877e-05
+      },
+      "reasoning": {
+        "success_rate": 0.9421686746987952,
+        "cost_per_success_usd": 0.0003139386189258323
+      },
+      "summarization": {
+        "success_rate": 0.9518072289156626,
+        "cost_per_success_usd": 0.00043784810126582283
+      },
+      "tool_use": {
+        "success_rate": 0.9542168674698795,
+        "cost_per_success_usd": 0.001506670454545453
+      }
+    },
+    "router_cold_start": {
+      "coding": {
+        "success_rate": 0.9590361445783132,
+        "cost_per_success_usd": 0.0005913316582914561
+      },
+      "extraction": {
+        "success_rate": 0.980722891566265,
+        "cost_per_success_usd": 0.0005336756756756758
+      },
+      "reasoning": {
+        "success_rate": 0.9759036144578314,
+        "cost_per_success_usd": 0.000696883950617284
+      },
+      "summarization": {
+        "success_rate": 0.9734939759036144,
+        "cost_per_success_usd": 0.000646336633663367
+      },
+      "tool_use": {
+        "success_rate": 0.9686746987951808,
+        "cost_per_success_usd": 0.0014534427860696526
+      }
+    },
+    "router_learned": {
+      "coding": {
+        "success_rate": 0.9590361445783132,
+        "cost_per_success_usd": 0.0005913316582914561
+      },
+      "extraction": {
+        "success_rate": 0.9951807228915662,
+        "cost_per_success_usd": 0.000382495157384988
+      },
+      "reasoning": {
+        "success_rate": 0.9759036144578314,
+        "cost_per_success_usd": 0.000696883950617284
+      },
+      "summarization": {
+        "success_rate": 0.9614457831325302,
+        "cost_per_success_usd": 0.0005757556390977447
+      },
+      "tool_use": {
+        "success_rate": 0.963855421686747,
+        "cost_per_success_usd": 0.0013095500000000003
+      }
+    }
+  },
+  "routing_mix": {
+    "coding": {
+      "mock-frontier": 192,
+      "mock-mid": 223
+    },
+    "extraction": {
+      "mock-frontier": 39,
+      "mock-small": 275,
+      "mock-mid": 101
+    },
+    "reasoning": {
+      "mock-mid": 220,
+      "mock-frontier": 195
+    },
+    "summarization": {
+      "mock-small": 239,
+      "mock-frontier": 116,
+      "mock-mid": 60
+    },
+    "tool_use": {
+      "mock-small": 181,
+      "mock-frontier": 173,
+      "mock-mid": 61
+    }
+  },
+  "sensitivity": [
+    {
+      "judge": "mid-tier judge, detects 85% (main result)",
+      "router_success": 0.9710843373493976,
+      "router_cost_per_success_usd": 0.0007092332506203504,
+      "router_false_acceptance": 0.009828009828009828,
+      "frontier_success": 0.9749397590361446,
+      "frontier_cost_per_success_usd": 0.0007705635195254579,
+      "saving_vs_frontier": 0.07959145138726131
+    },
+    {
+      "judge": "cheap judge, detects 70%",
+      "router_success": 0.9532530120481928,
+      "router_cost_per_success_usd": 0.0003950491405460079,
+      "router_false_acceptance": 0.018849206349206348,
+      "frontier_success": 0.9749397590361446,
+      "frontier_cost_per_success_usd": 0.0007705635195254579,
+      "saving_vs_frontier": 0.48732436647235244
+    },
+    {
+      "judge": "cheap judge, detects 50%",
+      "router_success": 0.9474698795180723,
+      "router_cost_per_success_usd": 0.0004817282807731424,
+      "router_false_acceptance": 0.014536340852130326,
+      "frontier_success": 0.9749397590361446,
+      "frontier_cost_per_success_usd": 0.0007705635195254579,
+      "saving_vs_frontier": 0.3748363780966313
+    },
+    {
+      "judge": "mid-tier judge, detects 60%",
+      "router_success": 0.9493975903614458,
+      "router_cost_per_success_usd": 0.0007952977157360392,
+      "router_false_acceptance": 0.012036108324974924,
+      "frontier_success": 0.9749397590361446,
+      "frontier_cost_per_success_usd": 0.0007705635195254579,
+      "saving_vs_frontier": -0.032098841411300594
+    }
+  ]
+}

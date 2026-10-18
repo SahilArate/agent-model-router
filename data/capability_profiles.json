@@ -1,0 +1,109 @@
+{
+  "records": [
+    {
+      "model_id": "mock-frontier",
+      "agent": "worker",
+      "category": "coding",
+      "successes": 73,
+      "failures": 5
+    },
+    {
+      "model_id": "mock-frontier",
+      "agent": "worker",
+      "category": "extraction",
+      "successes": 76,
+      "failures": 2
+    },
+    {
+      "model_id": "mock-frontier",
+      "agent": "worker",
+      "category": "reasoning",
+      "successes": 76,
+      "failures": 2
+    },
+    {
+      "model_id": "mock-frontier",
+      "agent": "worker",
+      "category": "summarization",
+      "successes": 75,
+      "failures": 3
+    },
+    {
+      "model_id": "mock-frontier",
+      "agent": "worker",
+      "category": "tool_use",
+      "successes": 76,
+      "failures": 2
+    },
+    {
+      "model_id": "mock-mid",
+      "agent": "worker",
+      "category": "coding",
+      "successes": 59,
+      "failures": 19
+    },
+    {
+      "model_id": "mock-mid",
+      "agent": "worker",
+      "category": "extraction",
+      "successes": 76,
+      "failures": 2
+    },
+    {
+      "model_id": "mock-mid",
+      "agent": "worker",
+      "category": "reasoning",
+      "successes": 66,
+      "failures": 12
+    },
+    {
+      "model_id": "mock-mid",
+      "agent": "worker",
+      "category": "summarization",
+      "successes": 72,
+      "failures": 6
+    },
+    {
+      "model_id": "mock-mid",
+      "agent": "worker",
+      "category": "tool_use",
+      "successes": 72,
+      "failures": 6
+    },
+    {
+      "model_id": "mock-small",
+      "agent": "worker",
+      "category": "coding",
+      "successes": 38,
+      "failures": 40
+    },
+    {
+      "model_id": "mock-small",
+      "agent": "worker",
+      "category": "extraction",
+      "successes": 72,
+      "failures": 6
+    },
+    {
+      "model_id": "mock-small",
+      "agent": "worker",
+      "category": "reasoning",
+      "successes": 38,
+      "failures": 40
+    },
+    {
+      "model_id": "mock-small",
+      "agent": "worker",
+      "category": "summarization",
+      "successes": 59,
+      "failures": 19
+    },
+    {
+      "model_id": "mock-small",
+      "agent": "worker",
+      "category": "tool_use",
+      "successes": 58,
+      "failures": 20
+    }
+  ]
+}
