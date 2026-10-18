@@ -1,3 +1,4 @@
+Live: https://agent-model-router.vercel.app/
 # Agent Model Router
 
 **Choosing the right LLM for every agent call, so output quality stays high and cost stays low.**
@@ -48,6 +49,78 @@ minimise    expected cost of the whole workflow
 subject to  probability the output is correct  ≥  a floor that depends on risk
             hard rules: privacy, context size, tool support, provider allow-list, budget
 ```
+
+##Architecture
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ EXPERIENCE   Dashboard (React · TypeScript · React Flow)                     │
+│   ┌──────────────────────────────┐     ┌─────────────────────────────────┐   │
+│   │ Live run                     │     │ Benchmark view                  │   │
+│   │ agent graph, routing reasons │     │ scorecard, significance, judge  │   │
+│   └──────────────┬───────────────┘     └────────────────┬────────────────┘   │
+└──────────────────┼──────────────────────────────────────┼────────────────────┘
+                   │ HTTPS                                │
+                   ▼                                      ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ SERVICE   FastAPI · Pydantic contracts                                       │
+│   POST /run      GET /models      GET /benchmark      GET /health            │
+└──────────────────┬───────────────────────────────────────────────────────────┘
+                   │
+                   ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ ORCHESTRATION   Multi-agent workflow (bounded, traced)                       │
+│                                                                              │
+│   ┌─────────┐      ┌───────────────────┐      ┌─────────────┐                │
+│   │ Planner │ ───▶ │ Workers (per step)│ ───▶ │ Synthesizer │                │
+│   └─────────┘      └───────────────────┘      └─────────────┘                │
+│                                                                              │
+│   Budget guard: cost cap · call cap · step cap  (checked before every call)  │
+└──────────────────┬───────────────────────────────────────────────────────────┘
+                   │ every LLM call goes through here, nothing bypasses it
+                   ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ DECISION CORE   Routed executor                                              │
+│                                                                              │
+│  ┌──────────┐    ┌────────────┐    ┌───────────┐    ┌──────────────────┐     │
+│  │ 1 ROUTE  │ ─▶ │ 2 GENERATE │ ─▶ │ 3 VERIFY  │ ─▶ │ 4 DECIDE         │     │
+│  │ pick     │    │ call model │    │ cheapest  │    │ accept / escalate│     │
+│  │ model +  │    │ measure    │    │ check     │    │ / abstain        │     │
+│  │ reason   │    │ cost, time │    │ first     │    │                  │     │
+│  └────┬─────┘    └─────▲──────┘    └─────┬─────┘    └────────┬─────────┘     │
+│       │                │                 │                   │               │
+│       │                └─────────────────┴───────────────────┘               │
+│       │                  escalate to next tier + failure evidence            │
+│       │                                                                      │
+│       ▼                                                                      │
+│  ┌─────────────────────────────┐    ┌──────────────────────────────────┐     │
+│  │ ROUTER                      │    │ VERIFICATION PIPELINE            │     │
+│  │ A  hard constraints         │    │ free checks (schema, rules)      │     │
+│  │    privacy, context, tools, │    │        │ pass                    │     │
+│  │    providers, budget        │    │        ▼                         │     │
+│  │ B  cheapest model whose     │    │ independent judge (other         │     │
+│  │    lower bound clears the   │    │ provider), fails closed          │     │
+│  │    risk floor               │    └──────────────────────────────────┘     │
+│  │ C  escalation path +        │                                             │
+│  │    cascade break-even test  │    ┌──────────────────────────────────┐     │
+│  └──────┬──────────────┬───────┘    │ LLM CLIENT                       │     │
+│         │              │            │ tokens, latency, cost            │     │
+│         │              │            │        │                         │     │
+│         │              │            │        ▼                         │     │
+│         │              │            │ LiteLLM ─▶ OpenAI · Anthropic ·  │     │
+│         │              │            │            Gemini · Simulated    │     │
+│         │              │            └──────────────────────────────────┘     │
+└─────────┼──────────────┼─────────────────────────────────────────────────────┘
+          │ reads        │ reads
+          ▼              ▼
+┌──────────────────┐  ┌──────────────────────┐   ┌───────────────────────────┐
+│ CAPABILITY       │  │ MODEL CATALOG        │   │ BENCHMARK HARNESS         │
+│ REGISTRY         │  │ prices, context      │   │ train / validation / test │
+│ Beta(1+s, 1+f)   │  │ window, privacy      │   │ McNemar + bootstrap       │
+│ per model, agent │  │ approval, enabled    │   │ judge sensitivity sweep   │
+│ role, task type  │  └──────────────────────┘   └─────────────┬─────────────┘
+└────────▲─────────┘                                           │
+         │        profiles learned on the train split          │
+         └─────────────────────────────────────────────────────┘
+                                                results ──▶ Benchmark view
 
 Four ideas make that practical.
 
