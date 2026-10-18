@@ -1,6 +1,7 @@
 """HTTP endpoints."""
 
-from typing import Annotated
+import json
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
@@ -51,3 +52,15 @@ async def run_workflow(body: RunRequest, services: ServicesDep) -> RunResponse:
     budget = Budget(max_cost_usd=body.max_cost_usd, max_calls=body.max_calls)
     result = await workflow.run(body.task, options, budget)
     return run_response(result, budget, body.mode)
+
+
+@router.get("/benchmark")
+def benchmark_results(services: ServicesDep) -> dict[str, Any]:
+    """The latest saved benchmark run (python -m app.benchmark.cli)."""
+    path = services.benchmark_path
+    if not path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="no benchmark results yet; run: python -m app.benchmark.cli",
+        )
+    return json.loads(path.read_text(encoding="utf-8"))

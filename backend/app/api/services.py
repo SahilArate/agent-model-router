@@ -18,7 +18,9 @@ from app.workflow.executor import RoutedExecutor
 from app.workflow.runner import MultiAgentWorkflow
 
 # backend/app/api/services.py -> repository root is three levels above "app"
-DEFAULT_PROFILES_PATH = Path(__file__).resolve().parents[3] / "data" / "capability_profiles.json"
+_DATA_DIR = Path(__file__).resolve().parents[3] / "data"
+DEFAULT_PROFILES_PATH = _DATA_DIR / "capability_profiles.json"
+DEFAULT_BENCHMARK_PATH = _DATA_DIR / "benchmark_results.json"
 
 
 class Mode(StrEnum):
@@ -38,6 +40,7 @@ class Services:
     mock_client: LLMClient
     live_client: LLMClient
     policy: RoutingPolicy = field(default_factory=RoutingPolicy)
+    benchmark_path: Path = DEFAULT_BENCHMARK_PATH
 
     def models_for(self, mode: Mode) -> list[ModelProfile]:
         is_mock = mode is Mode.MOCK

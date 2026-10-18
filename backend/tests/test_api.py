@@ -138,3 +138,24 @@ def test_scripted_responses_flow_through_the_api():
 
     assert body["completed"] is True
     assert body["final_answer"] == "final answer"
+
+
+def test_benchmark_is_404_until_a_run_exists(tmp_path):
+    services = make_services()
+    services.benchmark_path = tmp_path / "missing.json"
+    response = TestClient(create_app(services)).get("/benchmark")
+
+    assert response.status_code == 404
+    assert "app.benchmark.cli" in response.json()["detail"]
+
+
+def test_benchmark_returns_the_saved_results(tmp_path):
+    path = tmp_path / "benchmark_results.json"
+    path.write_text('{"chosen_low_floor": 0.6}', encoding="utf-8")
+    services = make_services()
+    services.benchmark_path = path
+
+    response = TestClient(create_app(services)).get("/benchmark")
+
+    assert response.status_code == 200
+    assert response.json() == {"chosen_low_floor": 0.6}
