@@ -12,7 +12,7 @@ from app.verification.checks import (
     max_chars,
     non_empty,
 )
-from app.verification.judge import JudgeCheck, pick_judge
+from app.verification.judge import JudgeCheck, estimated_judge_cost, pick_judge
 from app.verification.outcome import Action, decide
 from app.verification.pipeline import VerificationPipeline
 from app.verification.types import (
@@ -164,6 +164,41 @@ def test_worker_and_disabled_models_are_never_judges():
 
     with pytest.raises(ValueError):
         pick_judge([worker, make_model("off", enabled=False)], worker)
+
+
+def test_preferred_judge_wins_when_usable():
+    worker = make_model("w", Provider.MOCK)
+    cheap_other = make_model("cheap", Provider.OPENAI, price=0.1)
+    chosen = make_model("chosen", Provider.GROQ, price=9.0)
+
+    judge, independent = pick_judge([worker, cheap_other, chosen], worker, "chosen")
+
+    assert judge.id == "chosen" and independent is True
+
+
+def test_preferred_judge_is_ignored_when_it_is_the_worker_or_disabled():
+    worker = make_model("w", Provider.MOCK)
+    other = make_model("o", Provider.OPENAI)
+    off = make_model("off", Provider.GROQ, enabled=False)
+
+    assert pick_judge([worker, other, off], worker, "w")[0].id == "o"
+    assert pick_judge([worker, other, off], worker, "off")[0].id == "o"
+
+
+def test_preferred_judge_on_the_workers_provider_is_flagged_not_independent():
+    worker = make_model("w", Provider.MOCK)
+    same = make_model("same", Provider.MOCK)
+
+    judge, independent = pick_judge([worker, same], worker, "same")
+
+    assert judge.id == "same" and independent is False
+
+
+def test_estimated_judge_cost_uses_the_models_own_prices():
+    cheap = make_model("a", price=1.0)
+    dear = make_model("b", price=10.0)
+
+    assert 0 < estimated_judge_cost(cheap) < estimated_judge_cost(dear)
 
 
 # ---- judge check ----

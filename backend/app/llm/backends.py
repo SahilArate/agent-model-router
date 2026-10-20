@@ -73,6 +73,7 @@ class LiteLLMBackend:
             Provider.OPENAI: self._settings.openai_api_key,
             Provider.ANTHROPIC: self._settings.anthropic_api_key,
             Provider.GEMINI: self._settings.gemini_api_key,
+            Provider.GROQ: self._settings.groq_api_key,
         }
         secret = keys.get(provider)
         return secret.get_secret_value() if secret else None

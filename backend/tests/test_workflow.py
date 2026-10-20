@@ -4,7 +4,7 @@ import pytest
 from routing_helpers import PLAN_JSON, ScriptedLLM, client_for
 
 from app.agents.common import VerifierFactory
-from app.core.types import AgentRole, RiskLevel
+from app.core.types import AgentRole, RiskLevel, TaskCategory
 from app.registry.capability import CapabilityRegistry
 from app.router.engine import ModelRouter
 from app.workflow.budget import Budget
@@ -15,10 +15,12 @@ from app.workflow.spec import RunOptions
 TASK = "Summarise the key risks in the attached contract."
 
 
-def build_workflow(models, script, *, max_steps=4):
+def build_workflow(models, script, *, max_steps=4, registry=None, judge_model_id=None):
     client = client_for(script)
-    router = ModelRouter(models, CapabilityRegistry())
-    verifiers = VerifierFactory(client=client, judge_candidates=tuple(models))
+    router = ModelRouter(models, registry or CapabilityRegistry())
+    verifiers = VerifierFactory(
+        client=client, judge_candidates=tuple(models), judge_model_id=judge_model_id
+    )
     return MultiAgentWorkflow(RoutedExecutor(router, client), verifiers, max_steps=max_steps)
 
 
@@ -113,10 +115,36 @@ async def test_above_low_risk_an_independent_judge_is_paid_for(tier_models, scri
     assert all(t.attempts[-1].verification_cost_usd > 0 for t in result.traces)
 
 
-async def test_low_risk_skips_the_judge(tier_models, script):
-    await build_workflow(tier_models, script).run(TASK, RunOptions(), Budget(max_cost_usd=100.0))
+def proven_registry():
+    registry = CapabilityRegistry()
+    for agent in AgentRole:
+        for category in TaskCategory:
+            for _ in range(100):
+                registry.record("small", agent, category, success=True)
+    return registry
+
+
+async def test_low_risk_skips_the_judge_only_when_the_model_is_proven(tier_models, script):
+    workflow = build_workflow(tier_models, script, registry=proven_registry())
+
+    await workflow.run(TASK, RunOptions(), Budget(max_cost_usd=100.0))
 
     assert script.calls_for("judge") == []
+
+
+async def test_unproven_model_is_judged_even_at_low_risk(tier_models, script):
+    await build_workflow(tier_models, script).run(TASK, RunOptions(), Budget(max_cost_usd=100.0))
+
+    assert script.calls_for("judge") != []
+
+
+async def test_dedicated_judge_is_used_for_every_verdict(tier_models, script):
+    workflow = build_workflow(tier_models, script, judge_model_id="frontier")
+
+    await workflow.run(TASK, RunOptions(), Budget(max_cost_usd=100.0))
+
+    judge_calls = script.calls_for("judge")
+    assert judge_calls and all(call[1] == "frontier" for call in judge_calls)
 
 
 async def test_later_workers_see_compressed_earlier_results(tier_models):

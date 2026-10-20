@@ -20,18 +20,36 @@ _SYSTEM_PROMPT = (
 )
 
 
-def pick_judge(
-    candidates: Sequence[ModelProfile], worker: ModelProfile
-) -> tuple[ModelProfile, bool]:
-    """Choose a judge, preferring a different provider than the worker.
+# What one judge call is assumed to cost when the router weighs cheap-first against going direct:
+# the task, the criteria and the answer in, a short JSON verdict out.
+JUDGE_ESTIMATE_INPUT_TOKENS = 300
+JUDGE_ESTIMATE_OUTPUT_TOKENS = 40
 
-    Returns (judge, independent). A different provider gives a better chance of independent
-    errors; a same-provider judge is allowed but flagged as weaker. The worker itself is
-    never its own judge.
+
+def estimated_judge_cost(judge: ModelProfile) -> float:
+    return judge.cost(JUDGE_ESTIMATE_INPUT_TOKENS, JUDGE_ESTIMATE_OUTPUT_TOKENS)
+
+
+def pick_judge(
+    candidates: Sequence[ModelProfile],
+    worker: ModelProfile,
+    preferred_id: str | None = None,
+) -> tuple[ModelProfile, bool]:
+    """Choose a judge.
+
+    Returns (judge, independent). A configured judge (preferred_id) wins when it is enabled and
+    is not the worker. Otherwise the cheapest model from a different provider is chosen, since a
+    different provider gives a better chance of independent errors; a same-provider judge is
+    allowed but flagged as weaker. The worker itself is never its own judge.
     """
     others = [m for m in candidates if m.enabled and m.id != worker.id]
     if not others:
         raise ValueError("no judge available: need an enabled model other than the worker")
+
+    if preferred_id is not None:
+        configured = next((m for m in others if m.id == preferred_id), None)
+        if configured is not None:
+            return configured, configured.provider != worker.provider
 
     def price(model: ModelProfile) -> tuple[float, str]:
         return (model.input_price_per_mtok + model.output_price_per_mtok, model.id)
@@ -46,15 +64,20 @@ class JudgeCheck:
     name = "judge"
 
     def __init__(
-        self, client: LLMClient, candidates: Sequence[ModelProfile], rubric: str
+        self,
+        client: LLMClient,
+        candidates: Sequence[ModelProfile],
+        rubric: str,
+        preferred_id: str | None = None,
     ) -> None:
         self._client = client
         self._candidates = candidates
         self._rubric = rubric
+        self._preferred_id = preferred_id
 
     async def run(self, ctx: VerificationContext) -> CheckResult:
         try:
-            judge, independent = pick_judge(self._candidates, ctx.worker_model)
+            judge, independent = pick_judge(self._candidates, ctx.worker_model, self._preferred_id)
         except ValueError as exc:
             return CheckResult(self.name, CheckStatus.ERROR, str(exc))
 

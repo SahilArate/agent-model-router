@@ -19,6 +19,8 @@ class RunRequest(BaseModel):
     max_cost_usd: float = Field(default=0.50, gt=0, le=10)
     max_calls: int = Field(default=20, ge=1, le=50)
     max_steps: int = Field(default=4, ge=1, le=6)
+    # Dedicated judge for this run (a model id). Empty lets the system pick per call.
+    judge_model: str | None = Field(default=None, max_length=100)
 
 
 class EstimateOut(BaseModel):
@@ -93,6 +95,7 @@ class RunResponse(BaseModel):
     completed: bool
     final_answer: str | None
     abstained_at: str | None
+    judge_model: str | None = None
     cost_usd: float
     latency_s: float
     budget: BudgetOut
@@ -117,3 +120,4 @@ class HealthOut(BaseModel):
     status: str
     version: str
     configured_providers: list[str]
+    judge_model: str | None = None

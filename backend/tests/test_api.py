@@ -3,13 +3,14 @@ from fastapi.testclient import TestClient
 from routing_helpers import ScriptedLLM
 
 from app.api.factory import create_app
-from app.api.services import Services
+from app.api.services import Mode, Services
 from app.core.config import Settings
 from app.llm.backends import MockBackend
 from app.llm.client import LLMClient
 from app.llm.simulated import SimulatedLLM
 from app.registry.capability import CapabilityRegistry
 from app.registry.catalog import ModelCatalog
+from app.verification.judge import estimated_judge_cost
 
 
 def make_services(responder=None) -> Services:
@@ -159,3 +160,83 @@ def test_benchmark_returns_the_saved_results(tmp_path):
 
     assert response.status_code == 200
     assert response.json() == {"chosen_low_floor": 0.6}
+
+
+def test_deployed_dashboard_origin_is_allowed_through_settings():
+    services = make_services()
+    services.settings = Settings(
+        _env_file=None, cors_origins="https://demo.vercel.app/, https://x.dev"
+    )
+    client = TestClient(create_app(services))
+
+    allowed = client.get("/health", headers={"Origin": "https://demo.vercel.app"})
+    blocked = client.get("/health", headers={"Origin": "https://evil.example"})
+
+    assert allowed.headers["access-control-allow-origin"] == "https://demo.vercel.app"
+    assert "access-control-allow-origin" not in blocked.headers
+    assert services.settings.cors_origin_list == ["https://demo.vercel.app", "https://x.dev"]
+
+
+# ---- dedicated judge ----
+
+
+def test_run_reports_the_dedicated_judge_and_never_routes_work_to_it(client):
+    body = client.post(
+        "/run", json={"task": "Review the clause.", "risk": "medium", "judge_model": "mock-mid"}
+    ).json()
+
+    assert body["judge_model"] == "mock-mid"
+    models_used = {a["model_id"] for t in body["traces"] for a in t["attempts"]}
+    assert "mock-mid" not in models_used
+    judged = [c for t in body["traces"] for a in t["attempts"] for c in a["checks"]]
+    assert any(c["name"] == "judge" for c in judged)
+
+
+def test_run_without_a_judge_leaves_the_choice_automatic(client):
+    body = client.post("/run", json={"task": "Summarise the contract risks."}).json()
+
+    assert body["judge_model"] is None
+
+
+def test_unknown_judge_is_a_clear_422(client):
+    response = client.post("/run", json={"task": "Do it.", "judge_model": "no-such-model"})
+
+    assert response.status_code == 422
+    assert "no-such-model" in response.json()["detail"]
+
+
+def test_judge_from_the_other_mode_is_rejected(client):
+    response = client.post("/run", json={"task": "Do it.", "judge_model": "gpt-6-luna"})
+
+    assert response.status_code == 422
+
+
+def test_judge_model_setting_applies_to_runs():
+    services = make_services()
+    services.settings = Settings(_env_file=None, judge_model="mock-frontier")
+    client = TestClient(create_app(services))
+
+    body = client.post("/run", json={"task": "Summarise the contract risks."}).json()
+
+    assert body["judge_model"] == "mock-frontier"
+
+
+def test_judge_setting_naming_a_live_model_is_ignored_in_mock_mode():
+    services = make_services()
+    services.settings = Settings(_env_file=None, judge_model="groq-gpt-oss-120b")
+    client = TestClient(create_app(services))
+
+    body = client.post("/run", json={"task": "Summarise the contract risks."}).json()
+
+    assert body["completed"] is True and body["judge_model"] is None
+
+
+def test_policy_prices_verification_at_the_judge_cost():
+    services = make_services()
+    models = services.models_for(Mode.MOCK)
+    judge = next(m for m in models if m.id == "mock-mid")
+
+    policy = services.policy_for(models, judge)
+
+    assert policy.verify_cost_usd == pytest.approx(estimated_judge_cost(judge))
+    assert policy.verify_cost_usd > 0

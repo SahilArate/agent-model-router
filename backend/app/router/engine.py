@@ -61,7 +61,11 @@ class ModelRouter:
             fallbacks=tuple(c.model for c in path[: self._policy.max_escalations]),
             candidates=candidates,
             rejected=filtered.rejected,
-            requires_independent_verifier=request.risk is not RiskLevel.LOW,
+            # Above low risk always, and also whenever the model was not proven for this call:
+            # an unproven cheap answer has no evidence behind it, so something must check it.
+            requires_independent_verifier=(
+                request.risk is not RiskLevel.LOW or mode is not RoutingMode.PROVEN
+            ),
             reason=reason,
         )
 

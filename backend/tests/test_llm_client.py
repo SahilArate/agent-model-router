@@ -137,3 +137,14 @@ async def test_default_client_runs_mock_models_offline():
     result = await client.complete(make_model(Provider.MOCK), USER_HELLO)
 
     assert result.text.startswith("[test-model]")
+
+
+def test_groq_key_and_judge_model_settings(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "gsk-test")
+    monkeypatch.setenv("JUDGE_MODEL", "groq-gpt-oss-120b")
+
+    settings = Settings(_env_file=None)
+
+    assert "groq" in settings.configured_providers
+    assert settings.judge_model == "groq-gpt-oss-120b"
+    assert "gsk-test" not in repr(settings)

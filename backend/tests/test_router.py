@@ -103,7 +103,27 @@ def test_cold_start_low_risk_goes_cheap_first_with_escalation_path():
     assert decision.model.id == "small"
     assert decision.mode is RoutingMode.CHEAP_FIRST
     assert [m.id for m in decision.fallbacks] == ["mid", "frontier"]
+    # An unproven model is never trusted on deterministic checks alone, whatever the risk.
+    assert decision.requires_independent_verifier is True
+
+
+def test_proven_low_risk_model_needs_no_judge():
+    registry = CapabilityRegistry()
+    teach(registry, "small", 95, 5)
+
+    decision = router(registry).route(make_request())
+
+    assert decision.mode is RoutingMode.PROVEN
     assert decision.requires_independent_verifier is False
+
+
+def test_proven_model_still_gets_a_judge_above_low_risk():
+    registry = CapabilityRegistry()
+    teach(registry, "small", 200, 0)
+
+    decision = router(registry).route(make_request(risk=RiskLevel.MEDIUM))
+
+    assert decision.requires_independent_verifier is True
 
 
 def test_uneconomical_cascade_upgrades_directly():

@@ -47,6 +47,10 @@ class RoutedExecutor:
         except NoEligibleModelError as exc:
             return self._finish(spec, None, [], None, Action.ABSTAIN, str(exc))
 
+        pipeline = spec.pipeline
+        if decision.requires_independent_verifier and spec.judged_pipeline is not None:
+            pipeline = spec.judged_pipeline
+
         model = decision.model
         fallbacks = decision.fallbacks
         messages = list(spec.messages)
@@ -78,7 +82,7 @@ class RoutedExecutor:
                 continue
 
             budget.charge_call(result.cost_usd)
-            report = await spec.pipeline.verify(
+            report = await pipeline.verify(
                 VerificationContext(spec.task_prompt, result.text, model)
             )
             budget.charge(report.cost_usd)
@@ -102,9 +106,7 @@ class RoutedExecutor:
                     spec, decision, attempts, result.text, Action.ACCEPT, outcome.reason
                 )
             if outcome.action is Action.ABSTAIN or outcome.next_model is None:
-                return self._finish(
-                    spec, decision, attempts, None, Action.ABSTAIN, outcome.reason
-                )
+                return self._finish(spec, decision, attempts, None, Action.ABSTAIN, outcome.reason)
 
             model, fallbacks = outcome.next_model, outcome.remaining_fallbacks
             messages = [

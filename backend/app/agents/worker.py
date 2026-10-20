@@ -25,6 +25,7 @@ def worker_spec(
         f"Results so far:\n{earlier_results or '(none)'}\n\n"
         f"Your step:\n{step}"
     )
+    basic, judged = verifiers.build([non_empty()], _RUBRIC)
     return CallSpec(
         agent=AgentRole.WORKER,
         category=options.category,
@@ -33,7 +34,8 @@ def worker_spec(
             ChatMessage(role="system", content=_SYSTEM_PROMPT),
             ChatMessage(role="user", content=user_prompt),
         ),
-        pipeline=verifiers.pipeline([non_empty()], options.risk, _RUBRIC),
+        pipeline=basic,
+        judged_pipeline=judged,
         contains_sensitive_data=options.contains_sensitive_data,
         allowed_providers=options.allowed_providers,
     )

@@ -1,5 +1,3 @@
-"""Typed description of a candidate LLM: identity, pricing and capabilities."""
-
 from datetime import date
 from enum import StrEnum
 
@@ -15,27 +13,23 @@ class Provider(StrEnum):
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
     GEMINI = "gemini"
+    GROQ = "groq"
 
 
 class ModelProfile(BaseModel):
-    """Static facts about a model. Measured performance lives elsewhere (Bayesian profiles)."""
-
     model_config = ConfigDict(frozen=True)
 
     id: str
     provider: Provider
     litellm_model: str
     tier: Tier
-
     input_price_per_mtok: float = Field(ge=0)
     output_price_per_mtok: float = Field(ge=0)
     cached_input_price_per_mtok: float | None = Field(default=None, ge=0)
-
     context_window: int = Field(gt=0)
     supports_tools: bool = False
     supports_structured_output: bool = False
     approved_for_sensitive_data: bool = False
-
     enabled: bool = True
     pricing_verified_on: date | None = None
     notes: str = ""
@@ -48,16 +42,13 @@ class ModelProfile(BaseModel):
         return self
 
     def cost(self, input_tokens: int, output_tokens: int, cached_tokens: int = 0) -> float:
-        """Dollar cost of one call. cached_tokens is the part of the input served from cache."""
         if min(input_tokens, output_tokens, cached_tokens) < 0:
             raise ValueError("token counts must be non-negative")
         if cached_tokens > input_tokens:
             raise ValueError("cached_tokens cannot exceed input_tokens")
-
         cached_price = self.cached_input_price_per_mtok
         if cached_price is None:
             cached_price = self.input_price_per_mtok
-
         total = (
             (input_tokens - cached_tokens) * self.input_price_per_mtok
             + cached_tokens * cached_price

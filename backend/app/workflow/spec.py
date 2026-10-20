@@ -29,6 +29,8 @@ class CallSpec:
     needs_structured_output: bool = False
     contains_sensitive_data: bool = False
     allowed_providers: frozenset[Provider] | None = None
+    # Used instead of `pipeline` when the router asks for an independent verifier.
+    judged_pipeline: VerificationPipeline | None = None
 
     @property
     def task_prompt(self) -> str:

@@ -24,6 +24,7 @@ def synthesizer_spec(
     verifiers: VerifierFactory,
 ) -> CallSpec:
     numbered = "\n".join(f"{i}. {result}" for i, result in enumerate(step_results, start=1))
+    basic, judged = verifiers.build([non_empty()], _RUBRIC)
     return CallSpec(
         agent=AgentRole.SYNTHESIZER,
         category=options.category,
@@ -32,7 +33,8 @@ def synthesizer_spec(
             ChatMessage(role="system", content=_SYSTEM_PROMPT),
             ChatMessage(role="user", content=f"Task:\n{task}\n\nStep results:\n{numbered}"),
         ),
-        pipeline=verifiers.pipeline([non_empty()], options.risk, _RUBRIC),
+        pipeline=basic,
+        judged_pipeline=judged,
         contains_sensitive_data=options.contains_sensitive_data,
         allowed_providers=options.allowed_providers,
     )

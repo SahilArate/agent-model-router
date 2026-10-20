@@ -24,6 +24,7 @@ def parse_plan(text: str) -> list[str]:
 
 
 def plan_spec(task: str, options: RunOptions, verifiers: VerifierFactory) -> CallSpec:
+    basic, judged = verifiers.build([non_empty(), SchemaCheck(Plan)], _RUBRIC)
     return CallSpec(
         agent=AgentRole.PLANNER,
         category=options.category,
@@ -32,7 +33,8 @@ def plan_spec(task: str, options: RunOptions, verifiers: VerifierFactory) -> Cal
             ChatMessage(role="system", content=_SYSTEM_PROMPT),
             ChatMessage(role="user", content=task),
         ),
-        pipeline=verifiers.pipeline([non_empty(), SchemaCheck(Plan)], options.risk, _RUBRIC),
+        pipeline=basic,
+        judged_pipeline=judged,
         needs_structured_output=True,
         contains_sensitive_data=options.contains_sensitive_data,
         allowed_providers=options.allowed_providers,
