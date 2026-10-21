@@ -16,7 +16,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from app.benchmark.tasks import generate_tasks
-from app.core.config import Settings
+from app.core.config import API_KEY_ENV, Settings
 from app.llm.client import build_default_client
 from app.profiling.limiter import Limits, limits_for
 from app.profiling.runner import (
@@ -33,12 +33,6 @@ from app.registry.models import ModelProfile
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_OUT_DIR = REPO_ROOT / "data"
-ENV_VARS = {
-    "anthropic": "ANTHROPIC_API_KEY",
-    "openai": "OPENAI_API_KEY",
-    "gemini": "GEMINI_API_KEY",
-    "groq": "GROQ_API_KEY",
-}
 
 
 def fail(message: str) -> None:
@@ -60,7 +54,7 @@ def resolve_models(catalog: ModelCatalog, ids: list[str]) -> list[ModelProfile]:
 def missing_keys(models: list[ModelProfile], settings: Settings) -> list[str]:
     configured = set(settings.configured_providers)
     return sorted(
-        {ENV_VARS[m.provider.value] for m in models if m.provider.value not in configured}
+        {API_KEY_ENV[m.provider.value] for m in models if m.provider.value not in configured}
     )
 
 

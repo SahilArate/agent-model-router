@@ -1,4 +1,4 @@
-import type { BenchmarkResults, Health, RunRequest, RunResponse } from "./types";
+import type { BenchmarkResults, Health, ModelInfo, RunRequest, RunResponse } from "./types";
 
 const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
@@ -33,5 +33,6 @@ export const api = {
   health: () => request<Health>("/health"),
   run: (body: RunRequest) =>
     request<RunResponse>("/run", { method: "POST", body: JSON.stringify(body) }),
+  models: () => request<ModelInfo[]>("/models"),
   benchmark: () => request<BenchmarkResults>("/benchmark"),
 };

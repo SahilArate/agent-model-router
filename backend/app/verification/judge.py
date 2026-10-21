@@ -94,7 +94,13 @@ class JudgeCheck:
         try:
             result = await self._client.complete(judge, messages, max_tokens=200)
         except LLMError as exc:
-            return CheckResult(self.name, CheckStatus.ERROR, f"judge {judge.id} failed: {exc}")
+            return CheckResult(
+                self.name,
+                CheckStatus.ERROR,
+                f"judge {judge.id} failed: {exc}",
+                judge_model=judge.id,
+                independent=independent,
+            )
 
         note = "" if independent else " (same provider as worker: weaker independence)"
         try:
@@ -107,6 +113,8 @@ class JudgeCheck:
                 CheckStatus.ERROR,
                 f"judge {judge.id} gave an unparseable verdict{note}",
                 cost_usd=result.cost_usd,
+                judge_model=judge.id,
+                independent=independent,
             )
 
         return CheckResult(
@@ -114,4 +122,6 @@ class JudgeCheck:
             CheckStatus.PASS if passed else CheckStatus.FAIL,
             f"judge {judge.id}: {reason}{note}",
             cost_usd=result.cost_usd,
+            judge_model=judge.id,
+            independent=independent,
         )

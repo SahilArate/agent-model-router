@@ -5,7 +5,7 @@ from enum import StrEnum
 from pathlib import Path
 
 from app.agents.common import VerifierFactory
-from app.core.config import Settings, get_settings
+from app.core.config import API_KEY_ENV, Settings, get_settings
 from app.llm.backends import MockBackend
 from app.llm.client import LLMClient, build_default_client
 from app.llm.simulated import SimulatedLLM
@@ -21,6 +21,7 @@ from app.workflow.runner import MultiAgentWorkflow
 # backend/app/api/services.py -> repository root is three levels above "app"
 _DATA_DIR = Path(__file__).resolve().parents[3] / "data"
 DEFAULT_PROFILES_PATH = _DATA_DIR / "capability_profiles.json"
+DEFAULT_LIVE_PROFILES_PATH = _DATA_DIR / "live_capability_profiles.json"
 DEFAULT_BENCHMARK_PATH = _DATA_DIR / "benchmark_results.json"
 
 
@@ -31,6 +32,10 @@ class Mode(StrEnum):
 
 class NoModelsError(Exception):
     """No enabled models are available for the requested mode."""
+
+
+class MissingKeysError(NoModelsError):
+    """Live models are enabled but their provider API keys are not set."""
 
 
 class InvalidJudgeError(Exception):
@@ -50,12 +55,30 @@ class Services:
     settings: Settings
     mock_client: LLMClient
     live_client: LLMClient
+    # Measured profiles of real models. Kept apart from the simulated ones: they describe
+    # different models, and mixing them would let simulated skill numbers route real calls.
+    live_registry: CapabilityRegistry = field(default_factory=CapabilityRegistry)
     policy: RoutingPolicy = field(default_factory=RoutingPolicy)
     benchmark_path: Path = DEFAULT_BENCHMARK_PATH
 
     def models_for(self, mode: Mode) -> list[ModelProfile]:
         is_mock = mode is Mode.MOCK
         return [m for m in self.catalog.all() if (m.provider is Provider.MOCK) == is_mock]
+
+    def require_keys(self, models: list[ModelProfile]) -> None:
+        """Fail before any call when an enabled live model has no API key."""
+        configured = set(self.settings.configured_providers)
+        missing = {
+            m.provider.value: API_KEY_ENV[m.provider.value]
+            for m in models
+            if m.provider.value not in configured
+        }
+        if missing:
+            affected = sorted(m.id for m in models if m.provider.value in missing)
+            raise MissingKeysError(
+                f"live mode needs {', '.join(sorted(missing.values()))} for "
+                f"{', '.join(affected)}; set it on the server or disable those models"
+            )
 
     def judge_for(self, mode: Mode, requested: str | None = None) -> ModelProfile | None:
         """The dedicated judge for a run, or None to let the verifier pick one per call.
@@ -99,6 +122,8 @@ class Services:
                     else ""
                 )
             )
+        if mode is Mode.LIVE:
+            self.require_keys(models)
         judge = self.judge_for(mode, judge_model)
 
         # A dedicated judge never writes answers, so it can never grade its own work.
@@ -111,7 +136,8 @@ class Services:
             )
 
         client = self.mock_client if mode is Mode.MOCK else self.live_client
-        router = ModelRouter(workers, self.registry, self.policy_for(models, judge))
+        registry = self.registry if mode is Mode.MOCK else self.live_registry
+        router = ModelRouter(workers, registry, self.policy_for(models, judge))
         verifiers = VerifierFactory(
             client=client,
             judge_candidates=tuple(models),
@@ -130,9 +156,14 @@ def build_services(settings: Settings | None = None) -> Services:
     if DEFAULT_PROFILES_PATH.exists():
         registry.load(DEFAULT_PROFILES_PATH)
 
+    live_registry = CapabilityRegistry()
+    if DEFAULT_LIVE_PROFILES_PATH.exists():
+        live_registry.load(DEFAULT_LIVE_PROFILES_PATH)
+
     return Services(
         catalog=ModelCatalog.from_file(),
         registry=registry,
+        live_registry=live_registry,
         settings=settings,
         mock_client=LLMClient(MockBackend(responder=SimulatedLLM())),
         live_client=build_default_client(settings),

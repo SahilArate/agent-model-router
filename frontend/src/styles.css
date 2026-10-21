@@ -87,3 +87,7 @@ tr.chosen td { background: color-mix(in srgb, var(--accent) 10%, transparent); f
 .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 8px; flex-wrap: wrap; }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; }
 .chart .axis.strong { fill: var(--text); font-weight: 650; }
+
+.escalation { border: 1px solid var(--line); border-left: 3px solid var(--warn); border-radius: 6px; padding: 10px 12px; margin: 8px 0; }
+.escalation-head { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; }
+.escalation blockquote { margin: 6px 0 0; padding-left: 10px; border-left: 2px solid var(--line); color: var(--muted); }

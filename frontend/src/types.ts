@@ -13,6 +13,7 @@ export interface RunRequest {
   max_cost_usd: number;
   max_calls: number;
   max_steps: number;
+  judge_model: string | null;
 }
 
 export interface Estimate {
@@ -46,6 +47,25 @@ export interface Check {
   status: "pass" | "fail" | "error";
   detail: string;
   cost_usd: number;
+  judge_model: string | null;
+  independent: boolean | null;
+}
+
+export interface EscalationStep {
+  from_model: string;
+  to_model: string;
+  check: string;
+  reason: string;
+  judge_model: string | null;
+  independent: boolean | null;
+  wasted_cost_usd: number;
+}
+
+export interface ModelInfo {
+  id: string;
+  provider: string;
+  tier: string;
+  enabled: boolean;
 }
 
 export interface Attempt {
@@ -70,6 +90,7 @@ export interface CallTrace {
   cost_usd: number;
   latency_s: number;
   escalations: number;
+  escalation_steps: EscalationStep[];
   routing: Routing | null;
   attempts: Attempt[];
 }
@@ -80,6 +101,7 @@ export interface RunResponse {
   completed: boolean;
   final_answer: string | null;
   abstained_at: string | null;
+  judge_model: string | null;
   cost_usd: number;
   latency_s: number;
   budget: { spent_usd: number; calls: number; max_cost_usd: number; max_calls: number };
@@ -90,6 +112,7 @@ export interface Health {
   status: string;
   version: string;
   configured_providers: string[];
+  judge_model: string | null;
 }
 
 export interface Scorecard {

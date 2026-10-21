@@ -28,6 +28,8 @@ class CheckResult:
     status: CheckStatus
     detail: str = ""
     cost_usd: float = 0.0
+    judge_model: str | None = None  # set by the judge check: who gave this verdict
+    independent: bool | None = None  # judge from a different provider than the worker
 
 
 @dataclass(frozen=True)

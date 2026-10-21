@@ -1,15 +1,17 @@
 import pytest
 from fastapi.testclient import TestClient
-from routing_helpers import ScriptedLLM
+from routing_helpers import ScriptedLLM, make_model
 
 from app.api.factory import create_app
 from app.api.services import Mode, Services
 from app.core.config import Settings
+from app.core.types import AgentRole, TaskCategory, Tier
 from app.llm.backends import MockBackend
 from app.llm.client import LLMClient
 from app.llm.simulated import SimulatedLLM
 from app.registry.capability import CapabilityRegistry
 from app.registry.catalog import ModelCatalog
+from app.registry.models import Provider
 from app.verification.judge import estimated_judge_cost
 
 
@@ -240,3 +242,118 @@ def test_policy_prices_verification_at_the_judge_cost():
 
     assert policy.verify_cost_usd == pytest.approx(estimated_judge_cost(judge))
     assert policy.verify_cost_usd > 0
+
+
+# ---- live mode: keys, measured profiles, escalation explanations ----
+
+PLAN = '{"steps": ["a", "b"]}'
+
+
+def live_services(responder, *, keys=True) -> Services:
+    models = [
+        make_model("cheap", Tier.SMALL, 0.01, 0.01, provider=Provider.GEMINI),
+        make_model("mid", Tier.MID, 2.0, 10.0, provider=Provider.GEMINI),
+        make_model("grader", Tier.MID, 0.15, 0.6, provider=Provider.GROQ),
+    ]
+    settings = (
+        Settings(_env_file=None, gemini_api_key="k", groq_api_key="k")
+        if keys
+        else Settings(_env_file=None)
+    )
+    return Services(
+        catalog=ModelCatalog(models),
+        registry=CapabilityRegistry(),
+        settings=settings,
+        mock_client=LLMClient(MockBackend()),
+        live_client=LLMClient(MockBackend(responder=responder)),
+    )
+
+
+def grader_rejecting_cheap(model, messages):
+    system, last = messages[0].content, messages[-1].content
+    if "strict evaluator" in system:
+        if "[cheap]" in last:
+            return '{"pass": false, "reason": "omits the amounts"}'
+        return '{"pass": true, "reason": "ok"}'
+    if "planning agent" in system:
+        return PLAN
+    return f"[{model.id}] answer"
+
+
+LIVE_BODY = {"task": "Summarise the supplier contract.", "mode": "live", "judge_model": "grader"}
+
+
+def test_live_mode_without_provider_keys_is_a_clear_409():
+    client = TestClient(create_app(live_services(grader_rejecting_cheap, keys=False)))
+
+    response = client.post("/run", json=LIVE_BODY)
+
+    assert response.status_code == 409
+    detail = response.json()["detail"]
+    assert "GEMINI_API_KEY" in detail and "GROQ_API_KEY" in detail
+
+
+def test_live_run_explains_why_the_cheap_model_was_escalated():
+    client = TestClient(create_app(live_services(grader_rejecting_cheap)))
+
+    body = client.post("/run", json=LIVE_BODY).json()
+
+    assert body["completed"] is True and body["judge_model"] == "grader"
+    first = next(t for t in body["traces"] if t["agent"] == "worker")
+    assert first["routing"]["mode"] == "cheap_first"
+    step = first["escalation_steps"][0]
+    assert (step["from_model"], step["to_model"]) == ("cheap", "mid")
+    assert step["check"] == "judge" and step["judge_model"] == "grader"
+    assert step["independent"] is True
+    assert "omits the amounts" in step["reason"]
+    assert step["wasted_cost_usd"] > 0
+    judge_check = next(c for c in first["attempts"][0]["checks"] if c["name"] == "judge")
+    assert judge_check["judge_model"] == "grader"
+
+
+def test_a_provider_error_is_explained_as_the_reason_for_escalation():
+    def cheap_is_down(model, messages):
+        if model.id == "cheap" and "strict evaluator" not in messages[0].content:
+            raise RuntimeError("503 overloaded")
+        return grader_rejecting_cheap(model, messages)
+
+    client = TestClient(create_app(live_services(cheap_is_down)))
+
+    body = client.post("/run", json=LIVE_BODY).json()
+
+    step = body["traces"][0]["escalation_steps"][0]
+    assert step["check"] == "provider" and "503" in step["reason"]
+    assert step["judge_model"] is None
+
+
+def test_a_failed_format_check_is_explained_without_a_judge(client):
+    services = make_services(SimulatedLLM({"mock-small": 1.0}))
+    client = TestClient(create_app(services))
+
+    body = client.post("/run", json={"task": "Summarise the contract risks."}).json()
+
+    step = body["traces"][0]["escalation_steps"][0]
+    assert (step["from_model"], step["to_model"]) == ("mock-small", "mock-mid")
+    assert step["check"] != "judge" and step["reason"]
+
+
+def test_a_run_with_no_escalation_has_no_steps(client):
+    body = client.post("/run", json={"task": "Summarise the contract risks."}).json()
+
+    assert all(t["escalation_steps"] == [] for t in body["traces"])
+
+
+def test_live_runs_use_the_measured_profiles_not_the_simulated_ones():
+    services = live_services(grader_rejecting_cheap)
+    for _ in range(40):
+        services.live_registry.record(
+            "cheap", AgentRole.PLANNER, TaskCategory.REASONING, success=True
+        )
+        services.registry.record("mid", AgentRole.PLANNER, TaskCategory.REASONING, success=True)
+    client = TestClient(create_app(services))
+
+    body = client.post("/run", json=LIVE_BODY).json()
+
+    candidates = {c["model_id"]: c for c in body["traces"][0]["routing"]["candidates"]}
+    assert candidates["cheap"]["estimate"]["sample_size"] == 40
+    assert candidates["mid"]["estimate"]["sample_size"] == 0

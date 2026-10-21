@@ -6,6 +6,7 @@ from app.api.schemas import (
     CallTraceOut,
     CandidateOut,
     CheckOut,
+    EscalationOut,
     EstimateOut,
     ModelOut,
     RoutingOut,
@@ -14,6 +15,8 @@ from app.api.schemas import (
 from app.api.services import Mode
 from app.registry.models import ModelProfile
 from app.router.decision import RoutingDecision
+from app.verification.outcome import Action
+from app.verification.types import CheckStatus
 from app.workflow.budget import Budget
 from app.workflow.trace import AttemptTrace, CallTrace, WorkflowResult
 
@@ -72,10 +75,44 @@ def _attempt_out(attempt: AttemptTrace) -> AttemptOut:
         action=attempt.action.value if attempt.action else None,
         error=attempt.error,
         checks=[
-            CheckOut(name=c.name, status=c.status.value, detail=c.detail, cost_usd=c.cost_usd)
+            CheckOut(
+                name=c.name,
+                status=c.status.value,
+                detail=c.detail,
+                cost_usd=c.cost_usd,
+                judge_model=c.judge_model,
+                independent=c.independent,
+            )
             for c in attempt.checks
         ],
     )
+
+
+def _escalation_steps(trace: CallTrace) -> list[EscalationOut]:
+    """One entry per hand-over to a stronger model, with the evidence that caused it."""
+    steps = []
+    for attempt, following in zip(trace.attempts, trace.attempts[1:], strict=False):
+        if attempt.action is not Action.ESCALATE and not attempt.error:
+            continue
+        failed = next((c for c in attempt.checks if c.status is not CheckStatus.PASS), None)
+        if failed is not None:
+            check, reason = failed.name, failed.detail
+            judge_model, independent = failed.judge_model, failed.independent
+        else:
+            check, reason = "provider", attempt.error or "the call failed"
+            judge_model = independent = None
+        steps.append(
+            EscalationOut(
+                from_model=attempt.model_id,
+                to_model=following.model_id,
+                check=check,
+                reason=reason,
+                judge_model=judge_model,
+                independent=independent,
+                wasted_cost_usd=attempt.cost_usd,
+            )
+        )
+    return steps
 
 
 def _call_trace_out(trace: CallTrace) -> CallTraceOut:
@@ -89,6 +126,7 @@ def _call_trace_out(trace: CallTrace) -> CallTraceOut:
         cost_usd=trace.cost_usd,
         latency_s=trace.latency_s,
         escalations=trace.escalations,
+        escalation_steps=_escalation_steps(trace),
         routing=_routing_out(trace.decision) if trace.decision else None,
         attempts=[_attempt_out(a) for a in trace.attempts],
     )

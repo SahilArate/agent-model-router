@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Category, Risk, RunRequest } from "../types";
+import type { Category, Mode, ModelInfo, Risk, RunRequest } from "../types";
 
 const RISKS: Risk[] = ["low", "medium", "high"];
 const CATEGORIES: Category[] = ["extraction", "summarization", "reasoning", "coding", "tool_use"];
@@ -12,33 +12,66 @@ const EXAMPLES = [
 
 interface Props {
   busy: boolean;
+  models: ModelInfo[];
   onRun: (request: RunRequest) => void;
 }
 
-export default function RunForm({ busy, onRun }: Props) {
+export default function RunForm({ busy, models, onRun }: Props) {
   const [task, setTask] = useState(EXAMPLES[0].task);
   const [risk, setRisk] = useState<Risk>("low");
   const [category, setCategory] = useState<Category>("reasoning");
   const [sensitive, setSensitive] = useState(false);
   const [maxCost, setMaxCost] = useState(0.5);
+  const [mode, setMode] = useState<Mode>("mock");
+  const [judge, setJudge] = useState("");
+
+  // Only models of the chosen mode that are switched on can act as the judge.
+  const judges = models.filter((m) => m.enabled && (m.provider === "mock") === (mode === "mock"));
+
+  const changeMode = (next: Mode) => {
+    setMode(next);
+    setJudge("");
+  };
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
     onRun({
       task,
-      mode: "mock",
+      mode,
       risk,
       category,
       contains_sensitive_data: sensitive,
       max_cost_usd: maxCost,
       max_calls: 20,
       max_steps: 3,
+      judge_model: judge || null,
     });
   };
 
   return (
     <form className="panel form" onSubmit={submit}>
       <h2>Run a workflow</h2>
+
+      <div className="row">
+        <div>
+          <label htmlFor="mode">Models</label>
+          <select id="mode" value={mode} onChange={(e) => changeMode(e.target.value as Mode)}>
+            <option value="mock">Simulated (free, offline)</option>
+            <option value="live">Live (real providers)</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="judge">Judge</label>
+          <select id="judge" value={judge} onChange={(e) => setJudge(e.target.value)}>
+            <option value="">Automatic</option>
+            {judges.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.id}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       <label htmlFor="task">Task</label>
       <textarea
@@ -107,7 +140,11 @@ export default function RunForm({ busy, onRun }: Props) {
       <button className="primary" type="submit" disabled={busy || task.trim().length === 0}>
         {busy ? "Running…" : "Run workflow"}
       </button>
-      <p className="hint">Uses simulated models, so it is free and works offline.</p>
+      <p className="hint">
+        {mode === "mock"
+          ? "Uses simulated models, so it is free and works offline."
+          : "Calls real models with the server's API keys. A dedicated judge never writes answers, so it cannot grade its own work."}
+      </p>
     </form>
   );
 }

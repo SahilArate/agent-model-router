@@ -9,6 +9,7 @@ export default function Summary({ run }: { run: RunResponse }) {
     { label: "Budget used", value: pct(run.budget.spent_usd / run.budget.max_cost_usd) },
     { label: "Model calls", value: `${run.budget.calls} / ${run.budget.max_calls}` },
     { label: "Escalations", value: String(escalations) },
+    { label: "Judge", value: run.judge_model ?? "automatic" },
     { label: "Latency", value: seconds(run.latency_s) },
   ];
   return (

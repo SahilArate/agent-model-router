@@ -54,6 +54,20 @@ class CheckOut(BaseModel):
     status: str
     detail: str
     cost_usd: float
+    judge_model: str | None = None
+    independent: bool | None = None
+
+
+class EscalationOut(BaseModel):
+    """Why one attempt was rejected and the call moved to a stronger model."""
+
+    from_model: str
+    to_model: str
+    check: str  # the check that failed ("judge", "schema", "provider", ...)
+    reason: str
+    judge_model: str | None = None
+    independent: bool | None = None
+    wasted_cost_usd: float
 
 
 class AttemptOut(BaseModel):
@@ -78,6 +92,7 @@ class CallTraceOut(BaseModel):
     cost_usd: float
     latency_s: float
     escalations: int
+    escalation_steps: list[EscalationOut] = []
     routing: RoutingOut | None
     attempts: list[AttemptOut]
 

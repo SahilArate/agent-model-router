@@ -1,5 +1,5 @@
 import { pct, seconds, usd } from "../format";
-import type { Attempt, CallTrace } from "../types";
+import type { Attempt, CallTrace, EscalationStep } from "../types";
 
 function AttemptRow({ attempt, index }: { attempt: Attempt; index: number }) {
   return (
@@ -21,11 +21,33 @@ function AttemptRow({ attempt, index }: { attempt: Attempt; index: number }) {
       <div className="checks">
         {attempt.checks.map((check) => (
           <span key={check.name} className={`badge ${check.status}`} title={check.detail}>
-            {check.name}: {check.status}
+            {check.name}
+            {check.judge_model ? ` (${check.judge_model})` : ""}: {check.status}
           </span>
         ))}
       </div>
     </li>
+  );
+}
+
+function EscalationCard({ step }: { step: EscalationStep }) {
+  const verdict =
+    step.check === "provider"
+      ? "the provider call failed"
+      : step.judge_model
+        ? `judge ${step.judge_model}${step.independent ? " (a different provider)" : " (same provider: weaker independence)"} rejected the answer`
+        : `the ${step.check} check failed`;
+  return (
+    <div className="escalation">
+      <div className="escalation-head">
+        <strong>{step.from_model}</strong>
+        <span aria-hidden="true">→</span>
+        <strong>{step.to_model}</strong>
+        <span className="muted">wasted {usd(step.wasted_cost_usd)}</span>
+      </div>
+      <div>Because {verdict}:</div>
+      <blockquote>{step.reason}</blockquote>
+    </div>
   );
 }
 
@@ -79,6 +101,15 @@ export default function TraceDetail({ trace }: { trace: CallTrace }) {
         </>
       ) : (
         <p className="muted">No model could be routed for this call.</p>
+      )}
+
+      {trace.escalation_steps.length > 0 && (
+        <>
+          <h3>Why it was escalated</h3>
+          {trace.escalation_steps.map((step, i) => (
+            <EscalationCard key={i} step={step} />
+          ))}
+        </>
       )}
 
       <h3>Attempts</h3>
