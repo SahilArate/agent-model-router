@@ -88,7 +88,7 @@ def _attempt_out(attempt: AttemptTrace) -> AttemptOut:
     )
 
 
-def _escalation_steps(trace: CallTrace) -> list[EscalationOut]:
+def escalation_steps(trace: CallTrace) -> list[EscalationOut]:
     """One entry per hand-over to a stronger model, with the evidence that caused it."""
     steps = []
     for attempt, following in zip(trace.attempts, trace.attempts[1:], strict=False):
@@ -126,7 +126,7 @@ def _call_trace_out(trace: CallTrace) -> CallTraceOut:
         cost_usd=trace.cost_usd,
         latency_s=trace.latency_s,
         escalations=trace.escalations,
-        escalation_steps=_escalation_steps(trace),
+        escalation_steps=escalation_steps(trace),
         routing=_routing_out(trace.decision) if trace.decision else None,
         attempts=[_attempt_out(a) for a in trace.attempts],
     )

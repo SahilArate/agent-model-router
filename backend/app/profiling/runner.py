@@ -42,8 +42,16 @@ _FATAL = re.compile(
 _RATE_LIMITED = re.compile(r"rate.?limit|\b429\b|quota|too many requests", re.IGNORECASE)
 
 
+_DAILY_QUOTA = re.compile(r"per.?day|daily|requestsperday", re.IGNORECASE)
+
+
 def is_fatal(message: str) -> bool:
     return bool(_FATAL.search(message)) and not _RATE_LIMITED.search(message)
+
+
+def is_daily_quota(message: str) -> bool:
+    """A per-day limit is used up: waiting seconds or minutes will not help."""
+    return bool(_DAILY_QUOTA.search(message)) and bool(_RATE_LIMITED.search(message))
 
 
 def prompt_hash(task: Task) -> str:
@@ -118,8 +126,8 @@ def estimate_run(
     """Cost, call count and wall-clock time of what is still to run, before spending anything."""
     calls: dict[str, int] = {}
     worst = typical = 0.0
-    provider_calls: dict[str, int] = defaultdict(int)
-    provider_tokens: dict[str, int] = defaultdict(int)
+    model_calls: dict[str, int] = defaultdict(int)
+    model_tokens: dict[str, int] = defaultdict(int)
     for model in models:
         todo = [t for t in tasks if (model.id, t.id, prompt_hash(t)) not in done]
         calls[model.id] = len(todo)
@@ -127,12 +135,14 @@ def estimate_run(
             tokens_in = estimated_input_tokens(task)
             worst += model.cost(tokens_in, max_tokens)
             typical += model.cost(tokens_in, TYPICAL_OUTPUT_TOKENS)
-            provider_calls[model.provider.value] += 1
-            provider_tokens[model.provider.value] += tokens_in + max_tokens
+            model_calls[model.id] += 1
+            model_tokens[model.id] += tokens_in + max_tokens
     minutes = 0.0
-    for provider, n_calls in provider_calls.items():
+    by_id = {m.id: m for m in models}
+    for model_id, n_calls in model_calls.items():
+        provider = by_id[model_id].provider.value
         lim = (limits or {}).get(provider) or limits_for(provider)
-        minutes = max(minutes, n_calls / lim.rpm, provider_tokens[provider] / lim.tpm)
+        minutes = max(minutes, n_calls / lim.rpm, model_tokens[model_id] / lim.tpm)
     return RunEstimate(calls, worst, typical, minutes)
 
 
@@ -213,7 +223,7 @@ async def _call(
                 model, messages, max_tokens=config.max_tokens, temperature=0.0
             )
         except LLMError as exc:
-            if is_fatal(str(exc)):
+            if is_fatal(str(exc)) or is_daily_quota(str(exc)):
                 raise FatalModelError(str(exc)) from exc
             if attempt < len(config.retry_delays_s):
                 await sleep(config.retry_delays_s[attempt])
@@ -246,7 +256,13 @@ async def _run_model(
         try:
             result = await _call(model, task, client, limiter, guard, config, sleep)
         except FatalModelError as exc:
-            status.aborted = f"provider rejected the request: {exc}"
+            reason = (
+                "daily quota used up; run the same command again after it resets "
+                "(midnight Pacific time for Google)"
+                if is_daily_quota(str(exc))
+                else "provider rejected the request"
+            )
+            status.aborted = f"{reason}: {str(exc)[:200]}"
             break
         if result is None:
             if guard.reason is not None:
@@ -298,14 +314,14 @@ async def profile_models(
     existing = log.load()
     done = {r.key for r in existing}
     guard = Guard(config.max_cost_usd, config.max_calls)
-    limiters: dict[str, RateLimiter] = {}
-    for model in models:
-        provider = model.provider.value
-        if provider not in limiters:
-            limiters[provider] = RateLimiter(
-                (limits or {}).get(provider) or limits_for(provider),
-                sleep=limiter_sleep,
-            )
+    # Providers apply their limits per model, so each model gets its own window.
+    limiters = {
+        model.id: RateLimiter(
+            (limits or {}).get(model.provider.value) or limits_for(model.provider.value),
+            sleep=limiter_sleep,
+        )
+        for model in models
+    }
     statuses = {m.id: ModelStatus(m.id) for m in models}
 
     batches = await asyncio.gather(
@@ -314,7 +330,7 @@ async def profile_models(
                 m,
                 tasks,
                 client,
-                limiters[m.provider.value],
+                limiters[m.id],
                 guard,
                 log,
                 config,

@@ -22,6 +22,8 @@ _SYSTEM_PROMPT = (
 
 # What one judge call is assumed to cost when the router weighs cheap-first against going direct:
 # the task, the criteria and the answer in, a short JSON verdict out.
+# Reasoning models spend part of this budget thinking before they write the verdict.
+JUDGE_MAX_TOKENS = 600
 JUDGE_ESTIMATE_INPUT_TOKENS = 300
 JUDGE_ESTIMATE_OUTPUT_TOKENS = 40
 
@@ -69,7 +71,9 @@ class JudgeCheck:
         candidates: Sequence[ModelProfile],
         rubric: str,
         preferred_id: str | None = None,
+        max_tokens: int = JUDGE_MAX_TOKENS,
     ) -> None:
+        self._max_tokens = max_tokens
         self._client = client
         self._candidates = candidates
         self._rubric = rubric
@@ -92,7 +96,7 @@ class JudgeCheck:
             ),
         ]
         try:
-            result = await self._client.complete(judge, messages, max_tokens=200)
+            result = await self._client.complete(judge, messages, max_tokens=self._max_tokens)
         except LLMError as exc:
             return CheckResult(
                 self.name,

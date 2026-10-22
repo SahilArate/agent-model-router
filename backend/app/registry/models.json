@@ -144,8 +144,38 @@
       "supports_structured_output": true,
       "approved_for_sensitive_data": false,
       "enabled": false,
-      "pricing_verified_on": "2026-10-20",
-      "notes": "Google AI Studio. Free tier available (no card). List prices from the LiteLLM price map are used for cost accounting. Free-tier content may be used by the provider to improve its products: never send sensitive data."
+      "pricing_verified_on": "2026-10-22",
+      "notes": "Google AI Studio. Free of charge on the API; Google publishes no free-tier request limits (see aistudio.google.com/rate-limit for yours) and users report a very small daily cap for this model. List price is $0.75 / $3.75 per Mtok through 2026-12-31 and doubles from 2027-01-01. Free-tier content may be used by the provider: never send sensitive data."
+    },
+    {
+      "id": "gemini-3.6-flash",
+      "provider": "gemini",
+      "litellm_model": "gemini/gemini-3.6-flash",
+      "tier": "mid",
+      "input_price_per_mtok": 0.75,
+      "output_price_per_mtok": 3.75,
+      "context_window": 1048576,
+      "supports_tools": true,
+      "supports_structured_output": true,
+      "approved_for_sensitive_data": false,
+      "enabled": false,
+      "pricing_verified_on": "2026-10-22",
+      "notes": "Google AI Studio. Free of charge on the API; Google publishes no free-tier request limits (see aistudio.google.com/rate-limit for yours) and limits can differ per model. List price is $0.75 / $3.75 per Mtok through 2026-12-31 and doubles from 2027-01-01. Free-tier content may be used by the provider: never send sensitive data. Context window assumed equal to the other Flash models (unverified)."
+    },
+    {
+      "id": "groq-gpt-oss-20b",
+      "provider": "groq",
+      "litellm_model": "groq/openai/gpt-oss-20b",
+      "tier": "small",
+      "input_price_per_mtok": 0.075,
+      "output_price_per_mtok": 0.3,
+      "context_window": 131072,
+      "supports_tools": true,
+      "supports_structured_output": true,
+      "approved_for_sensitive_data": false,
+      "enabled": false,
+      "pricing_verified_on": "2026-10-22",
+      "notes": "Groq. Free plan limits per model (docs, 2026-10-22): 30 requests/min, 1,000 requests/day, 8,000 tokens/min, 200,000 tokens/day. Free-tier content may be used by the provider: never send sensitive data."
     },
     {
       "id": "groq-gpt-oss-120b",
@@ -159,8 +189,8 @@
       "supports_structured_output": true,
       "approved_for_sensitive_data": false,
       "enabled": false,
-      "pricing_verified_on": "2026-10-20",
-      "notes": "GroqCloud. Intended as a dedicated judge from a different provider than the Gemini workers. Free tier available (no card). List prices from the LiteLLM price map are used for cost accounting. Free-tier content may be used by the provider to improve its products: never send sensitive data."
+      "pricing_verified_on": "2026-10-22",
+      "notes": "Groq. Free plan limits per model (docs, 2026-10-22): 30 requests/min, 1,000 requests/day, 8,000 tokens/min, 200,000 tokens/day. Free-tier content may be used by the provider: never send sensitive data."
     }
   ]
 }

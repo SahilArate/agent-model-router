@@ -17,6 +17,7 @@ from app.profiling.runner import (
     RunLog,
     build_registry,
     estimate_run,
+    is_daily_quota,
     is_fatal,
     profile_models,
     prompt_hash,
@@ -381,3 +382,30 @@ def test_rpm_and_tpm_flags_override_the_defaults():
 )
 def test_fatal_errors_are_told_apart_from_rate_limits(message, fatal):
     assert is_fatal(message) is fatal
+
+
+@pytest.mark.parametrize(
+    ("message", "daily"),
+    [
+        ("429 Quota exceeded ... GenerateRequestsPerDayPerProjectPerModel-FreeTier", True),
+        ("429 RESOURCE_EXHAUSTED: daily limit reached", True),
+        ("429 Rate limit reached for requests per minute", False),
+        ("503 overloaded", False),
+    ],
+)
+def test_daily_quota_is_told_apart_from_a_per_minute_limit(message, daily):
+    assert is_daily_quota(message) is daily
+
+
+async def test_a_used_up_daily_quota_stops_that_model_at_once_with_a_clear_reason(tmp_path):
+    calls = []
+
+    def out_of_quota(model, messages):
+        calls.append(1)
+        raise RuntimeError("429 Quota exceeded: GenerateRequestsPerDayPerProjectPerModel-FreeTier")
+
+    result = await run([live_model()], out_of_quota, tmp_path)
+
+    assert len(calls) == 1
+    assert "daily quota" in result.statuses["gem"].aborted
+    assert result.statuses["gem"].errors == 0
