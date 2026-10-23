@@ -66,7 +66,7 @@ backend/app/
 ├── verification/
 │   ├── types.py         CheckStatus (pass, fail, error), CheckResult, VerificationReport
 │   ├── checks.py        SchemaCheck (JSON plus Pydantic), RuleCheck (non-empty, contains, regex, length)
-│   ├── judge.py         pick_judge and JudgeCheck (LLM-as-judge, fails closed)
+│   ├── judge.py         pick_judge, JudgeCheck (LLM-as-judge, fails closed), estimated_judge_cost
 │   ├── pipeline.py      Cheapest-first pipeline that stops at the first non-pass
 │   └── outcome.py       Action (accept, escalate, abstain) and decide()
 ├── workflow/
@@ -77,7 +77,8 @@ backend/app/
 │   └── runner.py        MultiAgentWorkflow: planner, workers, synthesizer
 ├── agents/              Prompt and verifier definitions for planner, worker, synthesizer
 ├── api/                 routes, schemas, serializers, services, application factory
-└── benchmark/           tasks, grading, simulated world, verifiers, runner, statistics, CLI
+├── benchmark/           tasks, grading, simulated world, verifiers, runner, statistics, CLI
+└── profiling/           limiter, runner (live profiling), guarded client, trace, CLIs
 ```
 
 Two rules keep the structure honest. Dependencies point downward: the router knows nothing about the API, and the registry knows nothing about the router. And only `RoutedExecutor` calls a model for the workflow, so a call cannot skip routing, verification or budgeting.
@@ -133,9 +134,9 @@ The pipeline runs checks in order and stops at the first result that is not `pas
 | Fail and a fallback remains | Escalate to the next model, carrying the failure evidence |
 | Fail and no fallback | Abstain |
 
-The judge is chosen by `pick_judge`: the cheapest enabled model that is not the worker, preferring a different provider (flagged as independent). It is never the worker itself.
+The judge is chosen by `pick_judge`. A configured judge (the `JUDGE_MODEL` setting or `judge_model` on the request) wins when it is enabled and is not the worker; otherwise the cheapest enabled model from a different provider is used, and a same-provider judge is allowed but flagged as weaker. It is never the worker itself. A configured judge is also removed from the routing pool, so it never writes answers. Each judge verdict carries the judge's id and whether it was independent, and these appear in the trace.
 
-The workflow's default verifier factory always runs deterministic checks and adds the judge above low risk, matching the router's `requires_independent_verifier` flag.
+The verifier factory builds two pipelines per call: deterministic checks only, and deterministic checks plus the judge. The executor picks the judged one when the router sets `requires_independent_verifier`, which is true whenever risk is above low **or** the chosen model is not proven (mode other than PROVEN). Before this rule, a low-risk call to an unproven model ran only free checks, so a plausible wrong answer was accepted and a configured judge had no effect. Now the cascade is priced with what one judge call really costs (`estimated_judge_cost`), not zero.
 
 ## 4. Execution model
 
@@ -265,7 +266,21 @@ python -m app.benchmark.cli                 # about 45 seconds
 python -m app.benchmark.cli --tasks 400 --repeats 3 --no-sensitivity   # quick run
 ```
 
-Outputs are written to `data/benchmark_results.json` and `data/capability_profiles.json` at the repository root. The API loads the profiles at start-up, so live runs route using the learned evidence, and `GET /benchmark` serves the results to the dashboard.
+Outputs are written to `data/benchmark_results.json` and `data/capability_profiles.json` at the repository root. The API loads them at start-up: the simulated profiles route simulated runs, and `GET /benchmark` serves the results to the dashboard.
+
+### 6.6 Measuring real models
+
+The `app/profiling` package replaces assumptions with measurements for real models.
+
+- **Profiler** (`python -m app.profiling.cli`). Generates the benchmark tasks, sends each to every chosen model, normalises the reply (reasoning tags, code fences and whitespace only; extra words still count as wrong), and grades it against the known answer. Results become worker-role Beta profiles in `data/live_capability_profiles.json`, plus a report with per-category and per-difficulty rates and Wilson intervals. Each call is appended to a JSON-lines log, so an interrupted run resumes and the same task is never measured twice.
+- **Safety on free tiers.** A per-provider sliding window limits requests and tokens per minute, with defaults below published limits. A guard caps notional spend and call count. Transient errors (rate limits, overload) are retried with backoff and are **not** recorded as model failures; a rejected key or unknown model id stops that model at once with the provider's message. A dry run prints the estimated cost, calls and time and checks which keys are missing.
+- **Trace** (`python -m app.profiling.trace_cli`). Runs the real router, verifier and a dedicated judge on tasks the profiler did not use. A recording client keeps every reply, so each attempt, including ones the judge rejected, is graded against ground truth. The summary reports success, escalation rate, wrong-but-accepted answers, and the judge's measured catch rate and false-reject rate with intervals. This is the evidence for how good the judge actually is.
+- **Live registry.** Live-mode runs on the API use `live_capability_profiles.json` only. Simulated skill numbers never route real calls.
+
+- **Judge comparison** (`python -m app.profiling.judge_cli`). Gives each judge the same items (every task with its correct answer and one plausible wrong answer) and reports catch rate and false-reject rate with Wilson intervals, per task type. No judge grades its own answer.
+- **Trace options.** `--categories` focuses a run on some task types, `--label` keeps output files apart, `--max-tokens` sets the reply budget (reasoning models can use it all and return nothing; truncated replies are flagged per attempt), and the output prints each worker's no-judge cost per success from the profiling run as a baseline.
+
+Limits of the measurement: one task generator with exact-answer tasks, profiles per category and worker role only, results valid for the date and model versions measured.
 
 ## 7. Testing
 
@@ -282,13 +297,15 @@ More than 160 automated tests run in a few seconds with no network access.
 | Executor | Accept, escalate with evidence, bounded loop, provider failure fallback, budget exhaustion, unverifiable output abstains, no eligible model |
 | Workflow | Happy path with cost accounting, planner failure then recovery, abstention stops the run, budget stops runaway calls, risk-dependent judge, context compression |
 | API | Health, models, run, validation errors, live-mode 409, benchmark endpoint with and without data |
+| Profiling | Sliding-window limiter, answer normalisation, resume without new calls, transient errors retried and not counted as failures, fatal errors told apart from rate limits, call and cost caps, truncation flagged |
+| Live trace | Judge sends a wrong cheap answer back and the stronger model fixes it, free check catches malformed answers, a blind judge lets errors through, judge confusion counts, resume, held-out tasks only |
 | Benchmark | Deterministic tasks, expected answers grade correct and wrong ones do not, disjoint complete splits, reproducible runs, sensible ordering of strategies, profiles learned from train only, JSON-safe output |
 
 Run with `pytest -q` from `backend/`. Static checks: `ruff check .` and, for the frontend, `npm run typecheck`.
 
 ## 8. Configuration, security and privacy
 
-- Settings are read from the environment or `backend/.env`: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `LOG_LEVEL`, `ENVIRONMENT`. Keys are `SecretStr` and never logged or returned by the API (`/health` lists only provider *names*).
+- Settings are read from the environment or `backend/.env`: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `GROQ_API_KEY`, `JUDGE_MODEL`, `CORS_ORIGINS`, `LOG_LEVEL`, `ENVIRONMENT`. Keys are `SecretStr` and never logged or returned by the API (`/health` lists only provider *names*).
 - Sensitive data is a first-class routing input. When a call is flagged, only models marked `approved_for_sensitive_data` are eligible, enforced in Stage A before any cost reasoning.
 - The `.env` file and key material must stay out of version control.
 - The API currently has no authentication and is intended to run locally or behind a gateway. CORS is limited to the local development origins.
@@ -305,6 +322,9 @@ Run with `pytest -q` from `backend/`. Static checks: `ruff check .` and, for the
 | Budget reached | The next call is not made and the workflow abstains with that reason |
 | An agent abstains | The workflow stops at that agent and reports it |
 | Live mode with no enabled real model | `409` with instructions |
+| Live mode with an enabled model whose provider key is missing | `409` naming the variable to set; nothing is called |
+| Requested judge unknown or not usable in that mode | `422` listing the available models |
+| Provider rate limit or overload during profiling | Retried with backoff; not counted as a model failure; the model stops after repeated consecutive errors and the run can resume |
 | Benchmark results missing | `404` with the command to create them |
 | New or rarely seen task type | Counts as unproven; low risk starts cheap with verification, higher risk uses the strongest model |
 
@@ -318,7 +338,9 @@ Run with `pytest -q` from `backend/`. Static checks: `ruff check .` and, for the
 - **Workers run sequentially.** Independent steps could run in parallel to cut latency.
 - **The static task generator is one distribution.** Results across other distributions are not claimed.
 - **No authentication on the API.**
-- **Prices for real models are unverified and the entries are disabled** until confirmed against provider pricing.
+- **Real-model entries are disabled by default** and their prices come from public price listings dated in `pricing_verified_on`; confirm them before relying on cost numbers. Prices that change with prompt size (a higher rate above a token threshold) are not modelled.
+- **Only the worker role is measured live.** Planner and synthesizer calls on real models therefore remain unproven and are judged.
+- **Free-tier limits are not published precisely** for every provider, so default throttles are conservative and may be adjusted with `--rpm` and `--tpm`.
 
 ## 11. Extending the system
 
@@ -326,7 +348,7 @@ Run with `pytest -q` from `backend/`. Static checks: `ruff check .` and, for the
 
 **Add a task category.** Add a value to `TaskCategory`, a task generator and a grading rule in the benchmark, and (for the simulated world) a skill row per model. No router change is needed: the registry key space is open.
 
-**Run the benchmark on real models.** `SimulatedWorld` is a responder with the signature `(model, messages) -> str`. Replace it with a backend that calls real models, and replace `NoisyJudge` with `JudgeCheck`. The strategies, split, statistics and reporting are unchanged.
+**Measure real models.** Use `app.profiling.cli` to profile them and `app.profiling.trace_cli` to trace the router and judge on held-out tasks (section 6.6). To run the full strategy comparison on real models, `SimulatedWorld` is a responder with the signature `(model, messages) -> str`: replace it with a backend that calls real models and replace `NoisyJudge` with `JudgeCheck`. The strategies, split, statistics and reporting are unchanged.
 
 **Change the policy.** Quality floors, the escalation limit, expected output fraction and verification cost are fields of `RoutingPolicy`.
 

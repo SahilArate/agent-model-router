@@ -1,4 +1,3 @@
-Live: https://agent-model-router.vercel.app/
 # Agent Model Router
 
 **Choosing the right LLM for every agent call, so output quality stays high and cost stays low.**
@@ -13,16 +12,23 @@ It is built as a working system rather than a diagram: a routing engine, a verif
 
 ## Contents
 
-1. [The problem](#1-the-problem)
-2. [The approach in one page](#2-the-approach-in-one-page)
-3. [Architecture](#3-architecture)
-4. [How one call is decided](#4-how-one-call-is-decided)
-5. [Results](#5-results)
-6. [Quick start](#6-quick-start)
-7. [Repository layout](#7-repository-layout)
-8. [API](#8-api)
-9. [Honest limitations](#9-honest-limitations)
-10. [Further reading](#10-further-reading)
+- [Agent Model Router](#agent-model-router)
+  - [Contents](#contents)
+  - [1. The problem](#1-the-problem)
+  - [2. The approach in one page](#2-the-approach-in-one-page)
+  - [3. Architecture](#3-architecture)
+    - [What each layer is responsible for](#what-each-layer-is-responsible-for)
+    - [One call, step by step](#one-call-step-by-step)
+  - [4. How one call is decided](#4-how-one-call-is-decided)
+  - [5. Results](#5-results)
+    - [What the numbers say](#what-the-numbers-say)
+    - [The saving depends on the judge, and the benchmark shows it](#the-saving-depends-on-the-judge-and-the-benchmark-shows-it)
+  - [6. Quick start](#6-quick-start)
+    - [Using real models](#using-real-models)
+  - [7. Repository layout](#7-repository-layout)
+  - [8. API](#8-api)
+  - [9. Honest limitations](#9-honest-limitations)
+  - [10. Further reading](#10-further-reading)
 
 ---
 
@@ -50,78 +56,6 @@ subject to  probability the output is correct  ≥  a floor that depends on risk
             hard rules: privacy, context size, tool support, provider allow-list, budget
 ```
 
-##Architecture
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ EXPERIENCE   Dashboard (React · TypeScript · React Flow)                     │
-│   ┌──────────────────────────────┐     ┌─────────────────────────────────┐   │
-│   │ Live run                     │     │ Benchmark view                  │   │
-│   │ agent graph, routing reasons │     │ scorecard, significance, judge  │   │
-│   └──────────────┬───────────────┘     └────────────────┬────────────────┘   │
-└──────────────────┼──────────────────────────────────────┼────────────────────┘
-                   │ HTTPS                                │
-                   ▼                                      ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ SERVICE   FastAPI · Pydantic contracts                                       │
-│   POST /run      GET /models      GET /benchmark      GET /health            │
-└──────────────────┬───────────────────────────────────────────────────────────┘
-                   │
-                   ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ ORCHESTRATION   Multi-agent workflow (bounded, traced)                       │
-│                                                                              │
-│   ┌─────────┐      ┌───────────────────┐      ┌─────────────┐                │
-│   │ Planner │ ───▶ │ Workers (per step)│ ───▶ │ Synthesizer │                │
-│   └─────────┘      └───────────────────┘      └─────────────┘                │
-│                                                                              │
-│   Budget guard: cost cap · call cap · step cap  (checked before every call)  │
-└──────────────────┬───────────────────────────────────────────────────────────┘
-                   │ every LLM call goes through here, nothing bypasses it
-                   ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ DECISION CORE   Routed executor                                              │
-│                                                                              │
-│  ┌──────────┐    ┌────────────┐    ┌───────────┐    ┌──────────────────┐     │
-│  │ 1 ROUTE  │ ─▶ │ 2 GENERATE │ ─▶ │ 3 VERIFY  │ ─▶ │ 4 DECIDE         │     │
-│  │ pick     │    │ call model │    │ cheapest  │    │ accept / escalate│     │
-│  │ model +  │    │ measure    │    │ check     │    │ / abstain        │     │
-│  │ reason   │    │ cost, time │    │ first     │    │                  │     │
-│  └────┬─────┘    └─────▲──────┘    └─────┬─────┘    └────────┬─────────┘     │
-│       │                │                 │                   │               │
-│       │                └─────────────────┴───────────────────┘               │
-│       │                  escalate to next tier + failure evidence            │
-│       │                                                                      │
-│       ▼                                                                      │
-│  ┌─────────────────────────────┐    ┌──────────────────────────────────┐     │
-│  │ ROUTER                      │    │ VERIFICATION PIPELINE            │     │
-│  │ A  hard constraints         │    │ free checks (schema, rules)      │     │
-│  │    privacy, context, tools, │    │        │ pass                    │     │
-│  │    providers, budget        │    │        ▼                         │     │
-│  │ B  cheapest model whose     │    │ independent judge (other         │     │
-│  │    lower bound clears the   │    │ provider), fails closed          │     │
-│  │    risk floor               │    └──────────────────────────────────┘     │
-│  │ C  escalation path +        │                                             │
-│  │    cascade break-even test  │    ┌──────────────────────────────────┐     │
-│  └──────┬──────────────┬───────┘    │ LLM CLIENT                       │     │
-│         │              │            │ tokens, latency, cost            │     │
-│         │              │            │        │                         │     │
-│         │              │            │        ▼                         │     │
-│         │              │            │ LiteLLM ─▶ OpenAI · Anthropic ·  │     │
-│         │              │            │            Gemini · Simulated    │     │
-│         │              │            └──────────────────────────────────┘     │
-└─────────┼──────────────┼─────────────────────────────────────────────────────┘
-          │ reads        │ reads
-          ▼              ▼
-┌──────────────────┐  ┌──────────────────────┐   ┌───────────────────────────┐
-│ CAPABILITY       │  │ MODEL CATALOG        │   │ BENCHMARK HARNESS         │
-│ REGISTRY         │  │ prices, context      │   │ train / validation / test │
-│ Beta(1+s, 1+f)   │  │ window, privacy      │   │ McNemar + bootstrap       │
-│ per model, agent │  │ approval, enabled    │   │ judge sensitivity sweep   │
-│ role, task type  │  └──────────────────────┘   └─────────────┬─────────────┘
-└────────▲─────────┘                                           │
-         │        profiles learned on the train split          │
-         └─────────────────────────────────────────────────────┘
-                                                results ──▶ Benchmark view
-
 Four ideas make that practical.
 
 1. **Measure, do not assume.** Each model's success rate is tracked per *agent role × task category* as a Beta distribution. Routing uses the *lower* credible bound (5th percentile), so a model with a lucky streak on little data cannot beat a model with solid evidence. Sample sizes are visible everywhere.
@@ -129,7 +63,7 @@ Four ideas make that practical.
 3. **Verify, then escalate or abstain.** Every output passes a verification pipeline ordered cheapest-first: free deterministic checks, then an independent judge. A failed output escalates to the next tier with the failure evidence attached. If output cannot be verified, or no stronger model remains, the system abstains instead of guessing.
 4. **Bound everything.** A per-workflow budget caps cost and call count, the escalation path is finite, and a provider failure falls back to another model. There is no unbounded loop.
 
-Risk changes the strategy, not just a threshold. Low-risk work may start cheap and rely on verification. Medium and high risk work with no proof of capability goes straight to the strongest model with an independent judge, because a wrong answer there costs more than the saving.
+Risk changes the strategy, not just a threshold. Low-risk work may start cheap and rely on verification. Medium and high risk work with no proof of capability goes straight to the strongest model with an independent judge, because a wrong answer there costs more than the saving. A model that has not yet proven itself on a kind of task is never trusted on format checks alone: the judge runs for it at every risk level, and only a model with a measured track record at low risk may skip it.
 
 ## 3. Architecture
 
@@ -284,7 +218,36 @@ npm run dev
 
 Open http://localhost:5173. The Live run tab uses simulated models, so it is free and works offline.
 
-**Using real models.** Real provider entries exist in [`models.json`](backend/app/registry/models.json) but are disabled, because prices must be verified against the provider's current pricing page first. To enable one, confirm its prices, set `"enabled": true`, add the provider key to `backend/.env` (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`), and run profiling on your own tasks so the router has evidence for them.
+### Using real models
+
+Real provider entries exist in [`models.json`](backend/app/registry/models.json) but are disabled, because prices must be verified against the provider's current pricing page first. Live mode on the API refuses to run, with a clear `409`, until a real model is enabled and its provider key is set.
+
+The repository includes tooling to measure real models instead of assuming their skill. It works on free tiers: the demo setup uses two Groq models as workers (`groq-gpt-oss-20b` as the cheap one, `groq-gpt-oss-120b` as the stronger one) and a Google AI Studio model as the independent judge (`gemini-3.5-flash-lite`), so the judge comes from a different provider than the workers. Measured results and the reasoning are in [`docs/LIVE_VALIDATION.md`](docs/LIVE_VALIDATION.md).
+
+1. Copy `backend/.env.example` to `backend/.env` and add `GEMINI_API_KEY` and `GROQ_API_KEY`. Keep the file out of version control.
+2. **Profile** the workers. This sends the benchmark tasks to the real models, grades each answer against its known result, and writes measured capability profiles. Calls are throttled per provider, spend and call counts are capped, transient errors are retried and never counted as a model failure, and the run resumes if interrupted.
+
+```
+cd backend
+python -m app.profiling.cli --models groq-gpt-oss-20b groq-gpt-oss-120b --dry-run   # estimate only
+python -m app.profiling.cli --models groq-gpt-oss-20b groq-gpt-oss-120b --tasks 100 --yes
+```
+
+3. **Trace** the real router and judge on tasks the profiler never saw. For each task it records which model answered, why the router chose it, whether the judge sent the answer back and with what reason, and whether every answer was actually right. The summary reports the judge's measured catch rate and false-reject rate.
+
+```
+python -m app.profiling.trace_cli --workers groq-gpt-oss-20b groq-gpt-oss-120b --judge gemini-3.5-flash-lite --yes
+```
+
+4. **Compare judges** on identical items, each task with its right answer and a plausible wrong one, to see which judge actually catches mistakes and which wrongly rejects good answers.
+
+```
+python -m app.profiling.judge_cli --judges groq-gpt-oss-120b gemini-3.5-flash-lite --yes
+```
+
+Outputs go to `data/live_capability_profiles.json`, `data/live_profile_report.json`, `data/live_routing_trace.json` and `data/live_judge_eval.json`. They are kept separate from the simulated profiles, because the two describe different models. To use a dedicated judge in the API, set `JUDGE_MODEL` or pass `judge_model` on a `/run` request; a judge never writes answers, so it cannot grade its own work.
+
+Free tiers cost nothing in practice. The tools report a notional cost at list price so the economics stay visible. Free-tier content may be used by the provider, so never send sensitive data through them.
 
 ## 7. Repository layout
 
@@ -300,10 +263,11 @@ agent-model-router/
 │   │   ├── workflow/      budget, executor loop, multi-agent runner, traces
 │   │   ├── agents/        planner, worker, synthesizer definitions
 │   │   ├── api/           FastAPI routes, schemas, serializers, application factory
-│   │   └── benchmark/     tasks, simulated world, strategies, statistics, CLI
+│   │   ├── benchmark/     tasks, simulated world, strategies, statistics, CLI
+│   │   └── profiling/     live profiling, rate limiting, live routing trace
 │   └── tests/             160+ automated tests
 ├── frontend/              React + TypeScript dashboard
-├── data/                  benchmark results and learned capability profiles
+├── data/                  benchmark results, simulated and measured capability profiles
 └── docs/                  LOGIC.md, TECHNICAL.md, images
 ```
 
@@ -316,11 +280,11 @@ agent-model-router/
 | POST | `/run` | Run the multi-agent workflow and return the complete trace |
 | GET | `/benchmark` | The latest saved benchmark results |
 
-`POST /run` takes the task, a risk level, a task type, a sensitivity flag and budget limits, and returns the final answer plus, for every agent call: the model chosen, the routing mode and written reason, every candidate with its measured rate, lower bound and sample size, each attempt with its checks and cost, and the budget used.
+`POST /run` takes the task, a mode (simulated or live), a risk level, a task type, a sensitivity flag, budget limits and an optional dedicated judge, and returns the final answer plus, for every agent call: the model chosen, the routing mode and written reason, every candidate with its measured rate, lower bound and sample size, each attempt with its checks and cost, and the budget used. When a call was handed to a stronger model, `escalation_steps` states why: the check that failed, the judge that said so and its reason, and what the rejected attempt cost.
 
 ## 9. Honest limitations
 
-- **The benchmark world is simulated.** Skill tables and judge accuracy are assumptions. The mechanism is validated; absolute numbers are not predictions for real models.
+- **The headline benchmark is simulated.** Skill tables and judge accuracy there are assumptions. The mechanism is validated; absolute numbers are not predictions for real models. The profiling and trace tools above replace those assumptions with measurements for the models you enable, and the measured numbers belong to that run, that task set and that date.
 - **Profiles are per task category, not per difficulty.** Averaging hard and easy tasks inside a category blurs the evidence. A difficulty signal is the most valuable next refinement.
 - **Ground truth is cheap here and expensive in production.** The benchmark has exact answers. A real deployment needs labelled samples or a trusted evaluator to keep profiles fresh and to detect drift.
 - **The judge is a model of a judge.** Real judges have correlated blind spots with the models they grade, which is why the router prefers a judge from a different provider and why deterministic checks run first.
@@ -330,4 +294,5 @@ agent-model-router/
 ## 10. Further reading
 
 - [`docs/LOGIC.md`](docs/LOGIC.md): a concrete scenario, the reasoning behind the approach, why it was chosen over the alternatives, and where each alternative still makes sense.
+- [`docs/LIVE_VALIDATION.md`](docs/LIVE_VALIDATION.md): the router on real models: why a cheaper model gets escalated, how judges compare, what verification really costs, where the simulated numbers came from and what to measure instead.
 - [`docs/TECHNICAL.md`](docs/TECHNICAL.md): stack, module internals, algorithms, API contract, evaluation methodology, testing, configuration, failure behaviour and how to extend the system.
