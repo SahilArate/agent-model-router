@@ -1,0 +1,1704 @@
+{
+  "summary": {
+    "gemini-3.5-flash-lite": {
+      "catches_wrong_answers": {
+        "hits": 29,
+        "n": 40,
+        "rate": 0.725,
+        "ci95": [
+          0.5716474916687543,
+          0.8389214656685692
+        ]
+      },
+      "wrongly_rejects_right_answers": {
+        "hits": 2,
+        "n": 40,
+        "rate": 0.05,
+        "ci95": [
+          0.013820377146101098,
+          0.165041708179252
+        ]
+      },
+      "unusable_verdicts": 0,
+      "cost_usd": 0.011576499999999997,
+      "by_category": {
+        "coding": {
+          "catches_wrong_answers": {
+            "hits": 2,
+            "n": 8,
+            "rate": 0.25,
+            "ci95": [
+              0.07147768885802763,
+              0.5907301208974108
+            ]
+          },
+          "wrongly_rejects_right_answers": {
+            "hits": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244156195108769
+            ]
+          },
+          "unusable_verdicts": 0
+        },
+        "extraction": {
+          "catches_wrong_answers": {
+            "hits": 8,
+            "n": 8,
+            "rate": 1.0,
+            "ci95": [
+              0.6755843804891231,
+              1.0
+            ]
+          },
+          "wrongly_rejects_right_answers": {
+            "hits": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244156195108769
+            ]
+          },
+          "unusable_verdicts": 0
+        },
+        "reasoning": {
+          "catches_wrong_answers": {
+            "hits": 4,
+            "n": 8,
+            "rate": 0.5,
+            "ci95": [
+              0.21521252682444186,
+              0.7847874731755582
+            ]
+          },
+          "wrongly_rejects_right_answers": {
+            "hits": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244156195108769
+            ]
+          },
+          "unusable_verdicts": 0
+        },
+        "summarization": {
+          "catches_wrong_answers": {
+            "hits": 7,
+            "n": 8,
+            "rate": 0.875,
+            "ci95": [
+              0.5291051942301386,
+              0.9775830911367038
+            ]
+          },
+          "wrongly_rejects_right_answers": {
+            "hits": 2,
+            "n": 8,
+            "rate": 0.25,
+            "ci95": [
+              0.07147768885802763,
+              0.5907301208974108
+            ]
+          },
+          "unusable_verdicts": 0
+        },
+        "tool_use": {
+          "catches_wrong_answers": {
+            "hits": 8,
+            "n": 8,
+            "rate": 1.0,
+            "ci95": [
+              0.6755843804891231,
+              1.0
+            ]
+          },
+          "wrongly_rejects_right_answers": {
+            "hits": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244156195108769
+            ]
+          },
+          "unusable_verdicts": 0
+        }
+      }
+    },
+    "groq-gpt-oss-120b": {
+      "catches_wrong_answers": {
+        "hits": 39,
+        "n": 39,
+        "rate": 1.0,
+        "ci95": [
+          0.9103301463997611,
+          1.0
+        ]
+      },
+      "wrongly_rejects_right_answers": {
+        "hits": 0,
+        "n": 40,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.08762453925039232
+        ]
+      },
+      "unusable_verdicts": 1,
+      "cost_usd": 0.0121164,
+      "by_category": {
+        "coding": {
+          "catches_wrong_answers": {
+            "hits": 7,
+            "n": 7,
+            "rate": 1.0,
+            "ci95": [
+              0.6456611570247934,
+              1.0
+            ]
+          },
+          "wrongly_rejects_right_answers": {
+            "hits": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244156195108769
+            ]
+          },
+          "unusable_verdicts": 1
+        },
+        "extraction": {
+          "catches_wrong_answers": {
+            "hits": 8,
+            "n": 8,
+            "rate": 1.0,
+            "ci95": [
+              0.6755843804891231,
+              1.0
+            ]
+          },
+          "wrongly_rejects_right_answers": {
+            "hits": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244156195108769
+            ]
+          },
+          "unusable_verdicts": 0
+        },
+        "reasoning": {
+          "catches_wrong_answers": {
+            "hits": 8,
+            "n": 8,
+            "rate": 1.0,
+            "ci95": [
+              0.6755843804891231,
+              1.0
+            ]
+          },
+          "wrongly_rejects_right_answers": {
+            "hits": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244156195108769
+            ]
+          },
+          "unusable_verdicts": 0
+        },
+        "summarization": {
+          "catches_wrong_answers": {
+            "hits": 8,
+            "n": 8,
+            "rate": 1.0,
+            "ci95": [
+              0.6755843804891231,
+              1.0
+            ]
+          },
+          "wrongly_rejects_right_answers": {
+            "hits": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244156195108769
+            ]
+          },
+          "unusable_verdicts": 0
+        },
+        "tool_use": {
+          "catches_wrong_answers": {
+            "hits": 8,
+            "n": 8,
+            "rate": 1.0,
+            "ci95": [
+              0.6755843804891231,
+              1.0
+            ]
+          },
+          "wrongly_rejects_right_answers": {
+            "hits": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244156195108769
+            ]
+          },
+          "unusable_verdicts": 0
+        }
+      }
+    }
+  },
+  "verdicts": [
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0000",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The response provides the exact numeric total with no additional text.",
+      "cost_usd": 7.139999999999999e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0000",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The extracted amount is incorrect; should be 2289.28.",
+      "cost_usd": 0.0001068
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0001",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly computes 16 + 16 - 5 = 27 and provides only the number.",
+      "cost_usd": 8.609999999999999e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0001",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The answer is incorrect; the correct result after adding 16 and subtracting 5 is 27, not 32.",
+      "cost_usd": 9.69e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0002",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The provided value matches the correct sum of squares.",
+      "cost_usd": 0.00022935
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0002",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The provided number is off by one; the correct sum is 15487260.",
+      "cost_usd": 0.00026175
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0003",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly identifies 'marble' as the most frequent word and provides only that word.",
+      "cost_usd": 0.00022514999999999997
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0003",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The most frequent word is marble, not lantern.",
+      "cost_usd": 0.00024555
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0004",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The response provides the correct JSON with the required tool name and arguments and no extra text.",
+      "cost_usd": 0.000102
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0004",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The city value is incorrect (\"Punex\" instead of \"Pune\").",
+      "cost_usd": 0.0001242
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0005",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly provides the total due as a plain number with no extra text.",
+      "cost_usd": 8.925e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0005",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The answer extracted the deposit amount instead of the total due ($1426.91).",
+      "cost_usd": 0.00011009999999999999
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0006",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer is correct and contains only the requested number.",
+      "cost_usd": 9.089999999999999e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0006",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The computed final units are 4, not 2.",
+      "cost_usd": 0.00011969999999999998
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0007",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly provides the exact numeric result without extra text.",
+      "cost_usd": 9.825e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0007",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The correct result is 5, not 6.",
+      "cost_usd": 0.00011325
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0008",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly identifies 'river' as the most frequent word and provides only that word.",
+      "cost_usd": 0.00016979999999999998
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0008",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The most frequent word is river, not orchard.",
+      "cost_usd": 0.00016935
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0009",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The response provides the correct JSON with tool name and arguments, no extra content.",
+      "cost_usd": 0.00011295
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0009",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: Destination value is incorrect (Oslox instead of Oslo).",
+      "cost_usd": 0.00014655
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0010",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The response provides the correct total amount due as a plain number with no extra text.",
+      "cost_usd": 0.0001002
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0010",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The extracted value is incorrect; the total due is 2818.51, not 1184.51.",
+      "cost_usd": 0.00015539999999999998
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0011",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The computed result matches the answer and it is the sole numeric output.",
+      "cost_usd": 0.00011159999999999999
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0011",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The correct final total is 374, not 368.",
+      "cost_usd": 9.9e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0012",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The sum correctly evaluates to 16932 and the response contains only the number.",
+      "cost_usd": 0.00033465000000000003
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0012",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "error",
+      "reason": "judge groq-gpt-oss-120b gave an unparseable verdict",
+      "cost_usd": 0.00038685
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0013",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer 'harbor' correctly identifies the most frequent word and contains no extra text.",
+      "cost_usd": 0.00023565
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0013",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The most frequent word is 'harbor', not 'lantern'.",
+      "cost_usd": 0.00020385
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0014",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The JSON includes the correct tool name and arguments matching the request, with no extra content.",
+      "cost_usd": 0.00015869999999999998
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0014",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The due_date value is incorrect (contains extra character).",
+      "cost_usd": 0.00012944999999999998
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0015",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The response provides the exact numeric total with no additional text.",
+      "cost_usd": 7.139999999999999e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0015",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The extracted amount is incorrect; it should be 4753.17, not 4763.17.",
+      "cost_usd": 9.659999999999999e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0016",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer 138 is the correct result and contains only the requested value.",
+      "cost_usd": 7.905e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0016",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The correct result is 138, not 46.",
+      "cost_usd": 9.525e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0017",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The provided number matches the correct sum of squares.",
+      "cost_usd": 0.00019035
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0017",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The provided number is incorrect; the correct sum is 9882335, not 9882336.",
+      "cost_usd": 0.00019875
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0018",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly identifies 'falcon' as the most frequent word and provides only that word as required.",
+      "cost_usd": 0.0002526
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0018",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The most frequent word is 'falcon', not 'cloud'.",
+      "cost_usd": 0.00022905
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0019",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The response provides the correct JSON with the required tool name and arguments and no extra content.",
+      "cost_usd": 0.00010169999999999999
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0019",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The minutes value is incorrect (463 instead of 462).",
+      "cost_usd": 8.609999999999999e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0020",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly provides the total due as a plain number with no extra text.",
+      "cost_usd": 8.955e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0020",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The answer gave the deposit amount instead of the total due ($3471.55).",
+      "cost_usd": 0.00013514999999999998
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0021",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The computed result is 66 and the response contains only the number as required.",
+      "cost_usd": 0.00010485
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0021",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The computed final total is 66, not 41.",
+      "cost_usd": 0.00010725
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0022",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: Correct value and format",
+      "cost_usd": 0.00014145
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0022",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The correct result is 30, not 31",
+      "cost_usd": 0.00018285
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0023",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly identifies 'meadow' as the most frequent word and provides only that word.",
+      "cost_usd": 0.00020775
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0023",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The answer 'river' is not the most frequent word; the correct word is 'meadow'.",
+      "cost_usd": 0.00021419999999999998
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0024",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The response exactly matches the required JSON format with correct tool name and arguments and contains no extra text.",
+      "cost_usd": 0.00011535
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0024",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The date argument is incorrect (contains extra characters)",
+      "cost_usd": 0.00014069999999999998
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0025",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly provides the total due as a plain number with no extra text.",
+      "cost_usd": 9.164999999999999e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0025",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The answer provided is not the total due amount ($4674.54) and is therefore incorrect.",
+      "cost_usd": 9.345e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0026",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The computed final count is 39 and the answer contains only that number.",
+      "cost_usd": 0.00010305
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0026",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The correct final count is 39, not 49.",
+      "cost_usd": 9.764999999999999e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0027",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The sum of numbers <237 divisible by 4 or 9 is correctly calculated as 9483.",
+      "cost_usd": 0.00033765000000000005
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0027",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The correct sum is 9483, not 9484.",
+      "cost_usd": 0.00034605000000000004
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0028",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly identifies 'orchard' as the most frequent word and provides only that word.",
+      "cost_usd": 0.0002118
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0028",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The most frequent word is 'orchard', not 'window'.",
+      "cost_usd": 0.00018644999999999998
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0029",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The JSON includes the correct tool name and arguments with no extra content, meeting the required format.",
+      "cost_usd": 0.000168
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0029",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The labels array is missing \"infra\"; it should be [\"api\", \"infra\"].",
+      "cost_usd": 0.00016755
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0030",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The response provides the exact numeric amount with no additional text.",
+      "cost_usd": 7.2e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0030",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The extracted amount is incorrect; should be 2623.88.",
+      "cost_usd": 0.0001068
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0031",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly computes (7*4)-19 = 9 and contains only the number.",
+      "cost_usd": 9.405e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0031",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The computed result should be 9, not 28.",
+      "cost_usd": 0.00012645
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0032",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The provided number matches the correct sum of squares.",
+      "cost_usd": 0.00018315
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0032",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The provided number is off by one; the correct sum is 12700856.",
+      "cost_usd": 0.00019994999999999998
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0033",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly identifies 'river' as the most frequent word.",
+      "cost_usd": 0.00018045
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0033",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The most frequent word is 'river', not 'thistle'.",
+      "cost_usd": 0.0001902
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0034",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The response provides exactly the required JSON with correct tool name and arguments and no extra content.",
+      "cost_usd": 0.000105
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0034",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: City name is incorrect",
+      "cost_usd": 0.00012194999999999998
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0035",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The response provides exactly the requested numeric value with no extra text.",
+      "cost_usd": 7.32e-05
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "extraction-0035",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The answer extracted the shipping amount instead of the total due, which should be 3787.50.",
+      "cost_usd": 0.00011099999999999999
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0036",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly computes the final units as 17 and provides only the number.",
+      "cost_usd": 0.00010425
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "reasoning-0036",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The correct result is 17, but the answer given is 2.",
+      "cost_usd": 0.00010605
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0037",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly provides the single number 65 with no extra content.",
+      "cost_usd": 0.00014504999999999997
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "coding-0037",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The correct result is 65, not 66.",
+      "cost_usd": 0.00016185
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0038",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The answer correctly identifies 'ember' as the most frequent word.",
+      "cost_usd": 0.00021794999999999999
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "summarization-0038",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The most frequent word is ember, not thistle.",
+      "cost_usd": 0.00023009999999999998
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0039",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge groq-gpt-oss-120b: The response exactly matches the required JSON format with correct tool name and arguments and contains no extra content.",
+      "cost_usd": 0.00011535
+    },
+    {
+      "judge_id": "groq-gpt-oss-120b",
+      "task_id": "tool_use-0039",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge groq-gpt-oss-120b: The date value is incorrect (contains extra characters).",
+      "cost_usd": 0.0001437
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0000",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The output contains only the requested number representing the total amount due.",
+      "cost_usd": 8.99e-05
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0000",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The extracted amount 2299.28 does not match the total due of 2289.28 from the invoice.",
+      "cost_usd": 0.0001324
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0001",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The calculation 16 + 16 - 5 = 27 is correct and the answer contains only the number.",
+      "cost_usd": 0.0001227
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0001",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The correct calculation is 16 + 16 - 5 = 27, but the provided answer is 32.",
+      "cost_usd": 0.0001277
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0002",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer is the exact mathematical sum of i*i for i from 0 to 359, formatted as requested with no extra characters.",
+      "cost_usd": 0.000144
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0002",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer is the exact mathematical evaluation of the sum of squares from 0 to 359, provided as a single number with no extra text.",
+      "cost_usd": 0.0001465
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0003",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly identifies 'marble' as the most frequent word in the text and contains no extra text.",
+      "cost_usd": 0.0001072
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0003",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The word 'marble' appears 6 times while the word 'lantern' appears only 4 times.",
+      "cost_usd": 0.00011970000000000001
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0004",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly provides the tool call with the specified function name and arguments in JSON format.",
+      "cost_usd": 0.00010719999999999999
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0004",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The city argument is incorrect as it was given as 'Punex' instead of 'Pune'.",
+      "cost_usd": 0.00011
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0005",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The output correctly extracts the total amount due as '1426.91' with no extra text.",
+      "cost_usd": 0.00012119999999999999
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0005",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The extracted value is the deposit paid, not the total amount due.",
+      "cost_usd": 9.84e-05
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0006",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly calculates 11 - 2 - 7 + 2 = 4 and provides only the number.",
+      "cost_usd": 0.0001345
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0006",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly calculates 11 - 2 - 7 + 2 = 4? Wait, let's check: 11 - 2 = 9; 9 - 7 = 2; 2 + 2 = 4. The provided answer is 2, which is incorrect.",
+      "cost_usd": 0.000237
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0007",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly evaluates the length of the list comprehension and contains only the requested number.",
+      "cost_usd": 9.9e-05
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0007",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The expression evaluates to 6, and the response contains only the number.",
+      "cost_usd": 9.4e-05
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0008",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly identifies 'river' as the most frequent word in the text and contains no extra text.",
+      "cost_usd": 0.0001072
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0008",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The word that appears most often in the text is 'river', which appears 5 times, whereas 'orchard' appears only 3 times.",
+      "cost_usd": 0.00013
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0009",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The output is valid JSON matching the exact tool call and arguments requested, with no extra text.",
+      "cost_usd": 0.0001235
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0009",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The destination argument was incorrectly modified to 'Oslox' instead of 'Oslo'.",
+      "cost_usd": 0.0001185
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0010",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly extracts the total due and contains only the number as requested.",
+      "cost_usd": 0.0001084
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0010",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The extracted value 1184.51 is the discount, not the total due ($2818.51).",
+      "cost_usd": 0.0001409
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0011",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer 374 is mathematically correct and provided as a number only.",
+      "cost_usd": 0.0001183
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0011",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer is mathematically correct and contains only the requested number.",
+      "cost_usd": 9.58e-05
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0012",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer is the correct sum of the specified generator expression and contains only the number.",
+      "cost_usd": 0.0001154
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0012",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The expression correctly evaluates to the sum of numbers from 0 to 293 that are divisible by 3 or 11, which is 16933.",
+      "cost_usd": 0.0001654
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0013",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The word 'harbor' appears 5 times, which is more than any other word in the text.",
+      "cost_usd": 0.00011059999999999999
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0013",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The word 'harbor' appears 5 times, while 'lantern' appears only 4 times.",
+      "cost_usd": 0.00010779999999999999
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0014",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The output correctly provides the tool call with the exact required arguments and format.",
+      "cost_usd": 0.00012759999999999998
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0014",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The due_date argument is incorrect (\"2026-12-21x\" instead of \"2026-12-21\").",
+      "cost_usd": 0.0001779
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0015",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The output correctly extracts the total amount due as requested with no extra characters or explanation.",
+      "cost_usd": 9.99e-05
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0015",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The extracted amount 4763.17 does not match the total due of 4753.17 from the invoice text.",
+      "cost_usd": 0.0001349
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0016",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The calculation (21 + 25) * 3 = 46 * 3 = 138 is correct and the output contains only the requested number.",
+      "cost_usd": 0.0001483
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0016",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The answer is incorrect because 21 + 25 = 46, but the total must then be multiplied by 3, resulting in 138.",
+      "cost_usd": 0.000158
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0017",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer is the exact mathematical sum of i*i for i from 0 to 309 and contains only the number.",
+      "cost_usd": 0.00013619999999999998
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0017",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer is the exact mathematical sum of i^2 for i from 0 to 309, which is 9882336, and it contains only the number without any explanation.",
+      "cost_usd": 0.0001762
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0018",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The word 'falcon' appears 9 times, while the word 'cloud' appears 6 times and 'stone' appears 5 times? Wait, let me recount. Text: falcon (1) cloud (1) ember (1) cloud (2) stone (1) cloud (3) cloud (4) cloud (5) falcon (2) falcon (3) stone (2) falcon (4) falcon (5) falcon (6) cloud (6) stone (3) falcon (7) falcon (8) falcon (9) thistle (1) stone (4) thistle (2) stone (5). Falcon count: 1, 2, 3, 4, 5, 6, 7, 8, 9. Wait, cloud count: 1, 2, 3, 4, 5, 6. Let me re-verify. falcon(1), cloud(1), ember(1), cloud(2), stone(1), cloud(3), cloud(4), cloud(5), falcon(2), falcon(3), stone(2), falcon(4), falcon(5), falcon(6), cloud(6), stone(3), falcon(7), falcon(8), falcon(9), thistle(1), stone(4), thistle(2), stone(5). Total falcon = 9. Wait, let me recount 'falcon': 1(falcon) 2(cloud) 3(ember) 4(cloud) 5(stone) 6(cloud) 7(cloud) 8(cloud) 9(falcon) 10(falcon) 11(stone) 12(falcon) 13(falcon) 14(falcon) 15(cloud) 16(stone) 17(falcon) 18(falcon) 19(falcon) 20(thistle) 21(stone) 22(thistle) 23(stone). Falcons are at positions 1, 9, 10, 12, 13, 14, 17, 18, 19. That is 9 falcons. Clouds are at 2, 4, 6, 7, 8, 15. That is 6 clouds. The answer 'falcon' is correct.",
+      "cost_usd": 0.0013224
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0018",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The word 'cloud' appears most frequently in the text (6 times), and the answer contains only that single word.",
+      "cost_usd": 0.0001299
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0019",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The output matches the requested tool call format and arguments exactly.",
+      "cost_usd": 0.0001059
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0019",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The minutes argument is 463 instead of the requested 462.",
+      "cost_usd": 0.0001059
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0020",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly extracts the total due and contains only the number as requested.",
+      "cost_usd": 0.00010209999999999999
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0020",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The extracted value 3206.66 is incorrect; the total due is 3471.55.",
+      "cost_usd": 0.0001446
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0021",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The calculation 6 * 4 = 24, + 17 = 41, + 25 = 66 is correct and the output contains only the requested number.",
+      "cost_usd": 0.0001729
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0021",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The calculation is incorrect; 6 * 4 = 24, + 17 = 41, + 25 = 66, but the provided answer is 41.",
+      "cost_usd": 0.0001654
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0022",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The expression correctly counts the number of integers from 0 to 88 inclusive that are divisible by 3, which is 30, and the output contains only the number.",
+      "cost_usd": 0.0001618
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0022",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The expression evaluates to 30, not 31 (range(89) includes 0 through 88, and multiples of 3 from 0 to 87 inclusive number 30 in total).",
+      "cost_usd": 0.0001718
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0023",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The word 'meadow' appears 5 times, which is more than any other word in the text, and the response contains only that single word.",
+      "cost_usd": 0.0001325
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0023",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The word 'meadow' appears 5 times, while 'river' appears 4 times, making 'meadow' the most frequent word.",
+      "cost_usd": 0.00012969999999999998
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0024",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer provides the correct tool name and arguments in the requested JSON format without any extra text.",
+      "cost_usd": 0.0001235
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0024",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The date argument contains an extraneous 'x' at the end ('2026-05-14x') instead of the requested '2026-05-14'.",
+      "cost_usd": 0.0001788
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0025",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly extracts the total amount due as 4674.54 with no extra text.",
+      "cost_usd": 0.0001256
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0025",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The extracted value 3919.80 is the subtotal, not the total due (4674.54).",
+      "cost_usd": 0.0001581
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0026",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly calculates the final number of units as 39 and contains only the requested number.",
+      "cost_usd": 0.00012859999999999998
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0026",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The calculation (19 * 2 - 32 + 30 + 13 - 10 = 49) is correct and the answer contains only the number.",
+      "cost_usd": 0.0001636
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0027",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer is the correct sum of the specified range and condition, containing only the requested number.",
+      "cost_usd": 0.0001198
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0027",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The expression evaluates to 9546, not 9484.",
+      "cost_usd": 0.0001148
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0028",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The word 'orchard' appears 5 times, which is more than any other word in the text, and the response contains only that single word.",
+      "cost_usd": 0.00014619999999999998
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0028",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The word that appears most often is 'orchard' (6 times), whereas 'window' appears 5 times.",
+      "cost_usd": 0.0001284
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0029",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly provides the tool name and arguments matching the user request and system format.",
+      "cost_usd": 0.000132
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0029",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The labels argument is missing 'infra' and only contains ['api'].",
+      "cost_usd": 0.0001236
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0030",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly extracts the total amount due as requested with no extra text.",
+      "cost_usd": 9.49e-05
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0030",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The extracted amount 2633.88 does not match the total due of 2623.88 from the text.",
+      "cost_usd": 0.0001324
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0031",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer is 9, which is mathematically correct (7 * 4 = 28; 28 - 19 = 9) and contains only the requested value.",
+      "cost_usd": 0.00015240000000000002
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0031",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The calculation is incorrect: 7 multiplied by 4 is 28, and 28 minus 19 is 9, not 28.",
+      "cost_usd": 0.0001527
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0032",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer is the exact mathematical evaluation of the sum of squares from 0 to 336 and contains only the number.",
+      "cost_usd": 0.000134
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0032",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The expression correctly calculates the sum of squares from 0 to 336, which evaluates to 12700857, and the answer contains only the number.",
+      "cost_usd": 0.000164
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0033",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The word 'river' appears 7 times, which is more than any other word in the text, and the response contains only that single word.",
+      "cost_usd": 0.00014309999999999998
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0033",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The word 'river' appears most often (7 times), while 'thistle' appears only 4 times.",
+      "cost_usd": 0.0001134
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0034",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The output matches the required JSON format and contains the correct tool name and arguments.",
+      "cost_usd": 0.00010219999999999999
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0034",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The city argument is incorrect ('Cairox' instead of 'Cairo').",
+      "cost_usd": 9.75e-05
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0035",
+      "category": "extraction",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly extracts the total amount due as requested with no extra text or formatting.",
+      "cost_usd": 0.0001065
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "extraction-0035",
+      "category": "extraction",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The extracted value corresponds to the shipping cost rather than the total amount due.",
+      "cost_usd": 0.0001015
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0036",
+      "category": "reasoning",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly calculates the final value and contains only the number as requested.",
+      "cost_usd": 9.819999999999999e-05
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "reasoning-0036",
+      "category": "reasoning",
+      "answer_correct": false,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly calculates the final value and contains only the requested number.",
+      "cost_usd": 9.54e-05
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0037",
+      "category": "coding",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly evaluates the length of the list comprehension and contains only the requested number.",
+      "cost_usd": 9.96e-05
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "coding-0037",
+      "category": "coding",
+      "answer_correct": false,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The answer correctly evaluates the length of the list comprehension and contains only the number.",
+      "cost_usd": 9.709999999999999e-05
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0038",
+      "category": "summarization",
+      "answer_correct": true,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The word 'thistle' appears 8 times, whereas 'ember' appears 7 times, making 'thistle' the most frequent word.",
+      "cost_usd": 0.00013209999999999999
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "summarization-0038",
+      "category": "summarization",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The word 'ember' appears 8 times, while 'thistle' appears 7 times and 'river' appears 6 times; therefore, 'ember' is the most frequent word, not 'thistle'.",
+      "cost_usd": 0.0001799
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0039",
+      "category": "tool_use",
+      "answer_correct": true,
+      "status": "pass",
+      "reason": "judge gemini-3.5-flash-lite: The output correctly calls the create_event tool with the specified arguments in valid JSON format.",
+      "cost_usd": 0.0001246
+    },
+    {
+      "judge_id": "gemini-3.5-flash-lite",
+      "task_id": "tool_use-0039",
+      "category": "tool_use",
+      "answer_correct": false,
+      "status": "fail",
+      "reason": "judge gemini-3.5-flash-lite: The date argument '2026-01-07x' is incorrect and does not match the user request of '2026-01-07'.",
+      "cost_usd": 0.0001749
+    }
+  ]
+}

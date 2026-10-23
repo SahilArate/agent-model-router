@@ -16,6 +16,7 @@ from app.registry.models import ModelProfile
 class RecordedCall:
     model_id: str
     text: str | None  # None when the call failed
+    output_tokens: int = 0
 
 
 class GuardedClient:
@@ -82,7 +83,7 @@ class GuardedClient:
                 continue
             RateLimiter.settle(reservation, result.input_tokens + result.output_tokens)
             self._guard.charge(result.cost_usd)
-            self.calls.append(RecordedCall(model.id, result.text))
+            self.calls.append(RecordedCall(model.id, result.text, result.output_tokens))
             return result
         self.calls.append(RecordedCall(model.id, None))
         raise last_error or LLMError(f"{model.id} call failed")

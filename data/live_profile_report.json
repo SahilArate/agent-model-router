@@ -1,0 +1,439 @@
+{
+  "generated_at": "2026-10-22T03:34:29+00:00",
+  "seed": 7,
+  "tasks_per_model": 100,
+  "max_tokens": 600,
+  "models": {
+    "groq-gpt-oss-20b": {
+      "litellm_model": "groq/openai/gpt-oss-20b",
+      "input_price_per_mtok": 0.075,
+      "output_price_per_mtok": 0.3,
+      "pricing_verified_on": "2026-10-22"
+    },
+    "groq-gpt-oss-120b": {
+      "litellm_model": "groq/openai/gpt-oss-120b",
+      "input_price_per_mtok": 0.15,
+      "output_price_per_mtok": 0.6,
+      "pricing_verified_on": "2026-10-22"
+    }
+  },
+  "notional_cost_usd": 0.008378100000000001,
+  "summary": {
+    "gemini-3.5-flash-lite": {
+      "overall": {
+        "n": 50,
+        "successes": 40,
+        "success_rate": 0.8,
+        "ci95": [
+          0.6696262789551477,
+          0.8875637005402612
+        ],
+        "mean_latency_s": 13.557660000000004,
+        "mean_cost_usd": 4.567199999999999e-05,
+        "truncated": 0
+      },
+      "by_category": {
+        "coding": {
+          "n": 10,
+          "successes": 2,
+          "success_rate": 0.2,
+          "ci95": [
+            0.056680947980693314,
+            0.5098431532792765
+          ],
+          "mean_latency_s": 11.7347,
+          "mean_cost_usd": 2.6059999999999998e-05,
+          "truncated": 0,
+          "lower_bound": 0.07882004566602885,
+          "sufficient_evidence": true
+        },
+        "extraction": {
+          "n": 10,
+          "successes": 10,
+          "success_rate": 1.0,
+          "ci95": [
+            0.7224598312333834,
+            1.0
+          ],
+          "mean_latency_s": 22.0378,
+          "mean_cost_usd": 3.775999999999999e-05,
+          "truncated": 0,
+          "lower_bound": 0.7615958096191473,
+          "sufficient_evidence": true
+        },
+        "reasoning": {
+          "n": 10,
+          "successes": 8,
+          "success_rate": 0.8,
+          "ci95": [
+            0.49015684672072335,
+            0.9433190520193067
+          ],
+          "mean_latency_s": 9.5427,
+          "mean_cost_usd": 2.566e-05,
+          "truncated": 0,
+          "lower_bound": 0.5299132007208236,
+          "sufficient_evidence": true
+        },
+        "summarization": {
+          "n": 10,
+          "successes": 10,
+          "success_rate": 1.0,
+          "ci95": [
+            0.7224598312333834,
+            1.0
+          ],
+          "mean_latency_s": 13.5842,
+          "mean_cost_usd": 1.8909999999999997e-05,
+          "truncated": 0,
+          "lower_bound": 0.7615958096191473,
+          "sufficient_evidence": true
+        },
+        "tool_use": {
+          "n": 10,
+          "successes": 10,
+          "success_rate": 1.0,
+          "ci95": [
+            0.7224598312333834,
+            1.0
+          ],
+          "mean_latency_s": 10.888900000000003,
+          "mean_cost_usd": 0.00011996999999999998,
+          "truncated": 0,
+          "lower_bound": 0.7615958096191473,
+          "sufficient_evidence": true
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "n": 20,
+          "successes": 16,
+          "success_rate": 0.8,
+          "ci95": [
+            0.5839782779742401,
+            0.9193436467288
+          ],
+          "mean_latency_s": 15.2066,
+          "mean_cost_usd": 3.298499999999999e-05,
+          "truncated": 0
+        },
+        "hard": {
+          "n": 15,
+          "successes": 10,
+          "success_rate": 0.6666666666666666,
+          "ci95": [
+            0.41713125151212976,
+            0.8482389930530876
+          ],
+          "mean_latency_s": 10.845133333333333,
+          "mean_cost_usd": 6.065333333333333e-05,
+          "truncated": 0
+        },
+        "medium": {
+          "n": 15,
+          "successes": 14,
+          "success_rate": 0.9333333333333333,
+          "ci95": [
+            0.7018292244757601,
+            0.9881334113938051
+          ],
+          "mean_latency_s": 14.071599999999997,
+          "mean_cost_usd": 4.7606666666666666e-05,
+          "truncated": 0
+        }
+      }
+    },
+    "gemini-3.8-flash": {
+      "overall": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ],
+        "mean_latency_s": 31.461,
+        "mean_cost_usd": 0.00062625,
+        "truncated": 0
+      },
+      "by_category": {
+        "extraction": {
+          "n": 1,
+          "successes": 1,
+          "success_rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ],
+          "mean_latency_s": 31.461,
+          "mean_cost_usd": 0.00062625,
+          "truncated": 0,
+          "lower_bound": 0.223606797749979,
+          "sufficient_evidence": false
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "n": 1,
+          "successes": 1,
+          "success_rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ],
+          "mean_latency_s": 31.461,
+          "mean_cost_usd": 0.00062625,
+          "truncated": 0
+        }
+      }
+    },
+    "groq-gpt-oss-120b": {
+      "overall": {
+        "n": 100,
+        "successes": 99,
+        "success_rate": 0.99,
+        "ci95": [
+          0.9455124752390653,
+          0.9982326134344526
+        ],
+        "mean_latency_s": 0.9532900000000005,
+        "mean_cost_usd": 0.00010536149999999999,
+        "truncated": 1
+      },
+      "by_category": {
+        "coding": {
+          "n": 20,
+          "successes": 19,
+          "success_rate": 0.95,
+          "ci95": [
+            0.7638641064874331,
+            0.9911187805671268
+          ],
+          "mean_latency_s": 1.0016,
+          "mean_cost_usd": 0.00019109999999999998,
+          "truncated": 1,
+          "lower_bound": 0.7932746209919301,
+          "sufficient_evidence": true
+        },
+        "extraction": {
+          "n": 20,
+          "successes": 20,
+          "success_rate": 1.0,
+          "ci95": [
+            0.8388698745050667,
+            1.0
+          ],
+          "mean_latency_s": 1.4348500000000002,
+          "mean_cost_usd": 4.63425e-05,
+          "truncated": 0,
+          "lower_bound": 0.8670540889734766,
+          "sufficient_evidence": true
+        },
+        "reasoning": {
+          "n": 20,
+          "successes": 20,
+          "success_rate": 1.0,
+          "ci95": [
+            0.8388698745050667,
+            1.0
+          ],
+          "mean_latency_s": 0.5965,
+          "mean_cost_usd": 5.273249999999999e-05,
+          "truncated": 0,
+          "lower_bound": 0.8670540889734766,
+          "sufficient_evidence": true
+        },
+        "summarization": {
+          "n": 20,
+          "successes": 20,
+          "success_rate": 1.0,
+          "ci95": [
+            0.8388698745050667,
+            1.0
+          ],
+          "mean_latency_s": 1.15895,
+          "mean_cost_usd": 0.00016658249999999998,
+          "truncated": 0,
+          "lower_bound": 0.8670540889734766,
+          "sufficient_evidence": true
+        },
+        "tool_use": {
+          "n": 20,
+          "successes": 20,
+          "success_rate": 1.0,
+          "ci95": [
+            0.8388698745050667,
+            1.0
+          ],
+          "mean_latency_s": 0.5745500000000001,
+          "mean_cost_usd": 7.004999999999997e-05,
+          "truncated": 0,
+          "lower_bound": 0.8670540889734766,
+          "sufficient_evidence": true
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "n": 35,
+          "successes": 35,
+          "success_rate": 1.0,
+          "ci95": [
+            0.9010957324106112,
+            1.0
+          ],
+          "mean_latency_s": 1.0972,
+          "mean_cost_usd": 9.97242857142857e-05,
+          "truncated": 0
+        },
+        "hard": {
+          "n": 30,
+          "successes": 29,
+          "success_rate": 0.9666666666666667,
+          "ci95": [
+            0.8332924860304112,
+            0.9940915620051425
+          ],
+          "mean_latency_s": 0.7667666666666666,
+          "mean_cost_usd": 0.000122725,
+          "truncated": 1
+        },
+        "medium": {
+          "n": 35,
+          "successes": 35,
+          "success_rate": 1.0,
+          "ci95": [
+            0.9010957324106112,
+            1.0
+          ],
+          "mean_latency_s": 0.9692571428571428,
+          "mean_cost_usd": 9.611571428571431e-05,
+          "truncated": 0
+        }
+      }
+    },
+    "groq-gpt-oss-20b": {
+      "overall": {
+        "n": 99,
+        "successes": 98,
+        "success_rate": 0.98989898989899,
+        "ci95": [
+          0.944983344585968,
+          0.9982147386799481
+        ],
+        "mean_latency_s": 0.6748484848484849,
+        "mean_cost_usd": 5.552575757575757e-05,
+        "truncated": 1
+      },
+      "by_category": {
+        "coding": {
+          "n": 20,
+          "successes": 19,
+          "success_rate": 0.95,
+          "ci95": [
+            0.7638641064874331,
+            0.9911187805671268
+          ],
+          "mean_latency_s": 0.7202,
+          "mean_cost_usd": 0.00010151999999999999,
+          "truncated": 1,
+          "lower_bound": 0.7932746209919301,
+          "sufficient_evidence": true
+        },
+        "extraction": {
+          "n": 20,
+          "successes": 20,
+          "success_rate": 1.0,
+          "ci95": [
+            0.8388698745050667,
+            1.0
+          ],
+          "mean_latency_s": 0.90305,
+          "mean_cost_usd": 2.834625e-05,
+          "truncated": 0,
+          "lower_bound": 0.8670540889734766,
+          "sufficient_evidence": true
+        },
+        "reasoning": {
+          "n": 20,
+          "successes": 20,
+          "success_rate": 1.0,
+          "ci95": [
+            0.8388698745050667,
+            1.0
+          ],
+          "mean_latency_s": 0.5149499999999999,
+          "mean_cost_usd": 3.128625e-05,
+          "truncated": 0,
+          "lower_bound": 0.8670540889734766,
+          "sufficient_evidence": true
+        },
+        "summarization": {
+          "n": 20,
+          "successes": 20,
+          "success_rate": 1.0,
+          "ci95": [
+            0.8388698745050667,
+            1.0
+          ],
+          "mean_latency_s": 0.76155,
+          "mean_cost_usd": 8.186625e-05,
+          "truncated": 0,
+          "lower_bound": 0.8670540889734766,
+          "sufficient_evidence": true
+        },
+        "tool_use": {
+          "n": 19,
+          "successes": 19,
+          "success_rate": 1.0,
+          "ci95": [
+            0.8318156346315496,
+            1.0
+          ],
+          "mean_latency_s": 0.4639473684210526,
+          "mean_cost_usd": 3.350921052631579e-05,
+          "truncated": 0,
+          "lower_bound": 0.8608916593317348,
+          "sufficient_evidence": true
+        }
+      },
+      "by_difficulty": {
+        "easy": {
+          "n": 35,
+          "successes": 35,
+          "success_rate": 1.0,
+          "ci95": [
+            0.9010957324106112,
+            1.0
+          ],
+          "mean_latency_s": 0.8159142857142857,
+          "mean_cost_usd": 5.167928571428571e-05,
+          "truncated": 0
+        },
+        "hard": {
+          "n": 29,
+          "successes": 28,
+          "success_rate": 0.9655172413793104,
+          "ci95": [
+            0.8282410893529976,
+            0.9938869433859677
+          ],
+          "mean_latency_s": 0.6732068965517238,
+          "mean_cost_usd": 6.823965517241378e-05,
+          "truncated": 1
+        },
+        "medium": {
+          "n": 35,
+          "successes": 35,
+          "success_rate": 1.0,
+          "ci95": [
+            0.9010957324106112,
+            1.0
+          ],
+          "mean_latency_s": 0.535142857142857,
+          "mean_cost_usd": 4.883785714285714e-05,
+          "truncated": 0
+        }
+      }
+    }
+  }
+}

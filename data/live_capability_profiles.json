@@ -1,0 +1,116 @@
+{
+  "records": [
+    {
+      "model_id": "gemini-3.5-flash-lite",
+      "agent": "worker",
+      "category": "coding",
+      "successes": 2,
+      "failures": 8
+    },
+    {
+      "model_id": "gemini-3.5-flash-lite",
+      "agent": "worker",
+      "category": "extraction",
+      "successes": 10,
+      "failures": 0
+    },
+    {
+      "model_id": "gemini-3.5-flash-lite",
+      "agent": "worker",
+      "category": "reasoning",
+      "successes": 8,
+      "failures": 2
+    },
+    {
+      "model_id": "gemini-3.5-flash-lite",
+      "agent": "worker",
+      "category": "summarization",
+      "successes": 10,
+      "failures": 0
+    },
+    {
+      "model_id": "gemini-3.5-flash-lite",
+      "agent": "worker",
+      "category": "tool_use",
+      "successes": 10,
+      "failures": 0
+    },
+    {
+      "model_id": "gemini-3.8-flash",
+      "agent": "worker",
+      "category": "extraction",
+      "successes": 1,
+      "failures": 0
+    },
+    {
+      "model_id": "groq-gpt-oss-120b",
+      "agent": "worker",
+      "category": "coding",
+      "successes": 19,
+      "failures": 1
+    },
+    {
+      "model_id": "groq-gpt-oss-120b",
+      "agent": "worker",
+      "category": "extraction",
+      "successes": 20,
+      "failures": 0
+    },
+    {
+      "model_id": "groq-gpt-oss-120b",
+      "agent": "worker",
+      "category": "reasoning",
+      "successes": 20,
+      "failures": 0
+    },
+    {
+      "model_id": "groq-gpt-oss-120b",
+      "agent": "worker",
+      "category": "summarization",
+      "successes": 20,
+      "failures": 0
+    },
+    {
+      "model_id": "groq-gpt-oss-120b",
+      "agent": "worker",
+      "category": "tool_use",
+      "successes": 20,
+      "failures": 0
+    },
+    {
+      "model_id": "groq-gpt-oss-20b",
+      "agent": "worker",
+      "category": "coding",
+      "successes": 19,
+      "failures": 1
+    },
+    {
+      "model_id": "groq-gpt-oss-20b",
+      "agent": "worker",
+      "category": "extraction",
+      "successes": 20,
+      "failures": 0
+    },
+    {
+      "model_id": "groq-gpt-oss-20b",
+      "agent": "worker",
+      "category": "reasoning",
+      "successes": 20,
+      "failures": 0
+    },
+    {
+      "model_id": "groq-gpt-oss-20b",
+      "agent": "worker",
+      "category": "summarization",
+      "successes": 20,
+      "failures": 0
+    },
+    {
+      "model_id": "groq-gpt-oss-20b",
+      "agent": "worker",
+      "category": "tool_use",
+      "successes": 19,
+      "failures": 0
+    }
+  ]
+}

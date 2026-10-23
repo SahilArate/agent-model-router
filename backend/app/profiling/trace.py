@@ -18,8 +18,8 @@ from app.benchmark.tasks import Task
 from app.core.types import AgentRole
 from app.llm.types import ChatMessage
 from app.profiling.answers import normalize_answer
-from app.profiling.guarded import GuardedClient
-from app.profiling.runner import SYSTEM_PROMPT, prompt_hash
+from app.profiling.guarded import GuardedClient, RecordedCall
+from app.profiling.runner import SYSTEM_PROMPT, RunRecord, prompt_hash
 from app.registry.capability import CapabilityRegistry
 from app.registry.models import ModelProfile
 from app.router.engine import ModelRouter
@@ -61,6 +61,8 @@ class AttemptResult:
     action: str | None
     error: str
     checks: list[dict]
+    output_tokens: int = 0
+    truncated: bool = False  # the reply used the whole token budget and may be cut off
 
 
 @dataclass
@@ -91,10 +93,12 @@ def build_pipelines(
     return basic, VerificationPipeline([FormatCheck(task), judge_check])
 
 
-def _attempts(task: Task, trace, answers: list[str | None]) -> list[AttemptResult]:
+def _attempts(task: Task, trace, calls: list[RecordedCall], max_tokens: int) -> list[AttemptResult]:
     results = []
     for index, attempt in enumerate(trace.attempts):
-        text = answers[index] if index < len(answers) else None
+        call = calls[index] if index < len(calls) else None
+        text = call.text if call else None
+        tokens = call.output_tokens if call else 0
         results.append(
             AttemptResult(
                 model_id=attempt.model_id,
@@ -102,6 +106,8 @@ def _attempts(task: Task, trace, answers: list[str | None]) -> list[AttemptResul
                 correct=None if text is None else is_correct(task, normalize_answer(text)),
                 action=attempt.action.value if attempt.action else None,
                 error=attempt.error,
+                output_tokens=tokens,
+                truncated=tokens >= max_tokens > 0,
                 checks=[
                     {
                         "name": c.name,
@@ -124,6 +130,7 @@ async def trace_task(
     judge: ModelProfile,
     workers: Sequence[ModelProfile],
     risk_override=None,
+    max_output_tokens: int = MAX_OUTPUT_TOKENS,
 ) -> TaskResult:
     basic, judged = build_pipelines(task, client, judge, workers)
     spec = CallSpec(
@@ -136,11 +143,11 @@ async def trace_task(
         ),
         pipeline=basic,
         judged_pipeline=judged,
-        max_output_tokens=MAX_OUTPUT_TOKENS,
+        max_output_tokens=max_output_tokens,
     )
     client.calls.clear()
     trace = await executor.run(spec, Budget(max_cost_usd=1.0, max_calls=8))
-    answers = [c.text for c in client.calls if c.model_id != judge.id]
+    calls = [c for c in client.calls if c.model_id != judge.id]
     final = normalize_answer(trace.output) if trace.output is not None else None
     return TaskResult(
         task_id=task.id,
@@ -151,7 +158,7 @@ async def trace_task(
         routing_mode=trace.decision.mode.value if trace.decision else "none",
         routing_reason=trace.decision.reason if trace.decision else trace.reason,
         judged=bool(trace.decision and trace.decision.requires_independent_verifier),
-        attempts=_attempts(task, trace, answers),
+        attempts=_attempts(task, trace, calls, max_output_tokens),
         escalation_steps=[s.model_dump() for s in escalation_steps(trace)],
         final_model=trace.attempts[-1].model_id if trace.attempts else None,
         accepted=trace.final_action is Action.ACCEPT,
@@ -193,6 +200,7 @@ async def run_trace(
     log: TraceLog,
     *,
     risk=None,
+    max_output_tokens: int = MAX_OUTPUT_TOKENS,
     stop_reason: Callable[[], str | None] = lambda: None,
     say: Callable[[str], None] = print,
 ) -> list[TaskResult]:
@@ -206,7 +214,7 @@ async def run_trace(
         if stop_reason() is not None:
             say(f"stopping: {stop_reason()}")
             break
-        result = await trace_task(task, executor, client, judge, workers, risk)
+        result = await trace_task(task, executor, client, judge, workers, risk, max_output_tokens)
         log.append(result)
         results.append(result)
         done.add((task.id, result.prompt_sha))
@@ -252,6 +260,7 @@ def summarise_trace(results: Sequence[TaskResult]) -> dict:
         "escalated_tasks": _rate(sum(bool(r.escalation_steps) for r in results), n),
         "routing_modes": dict(Counter(r.routing_mode for r in results)),
         "final_models": dict(Counter(r.final_model or "none" for r in results)),
+        "truncated_attempts": sum(a.truncated for r in results for a in r.attempts),
         "total_cost_usd": total_cost,
         "cost_per_success_usd": total_cost / correct if correct else None,
         "judge": {
@@ -264,10 +273,18 @@ def summarise_trace(results: Sequence[TaskResult]) -> dict:
     }
 
 
-def first_escalation(results: Sequence[TaskResult]) -> TaskResult | None:
-    """A task where the judge sent a cheaper model's answer back: the Q3 exhibit."""
+def first_escalation(
+    results: Sequence[TaskResult], *, judge_only: bool = True
+) -> TaskResult | None:
+    """A task where a cheaper model's answer was sent back. By default only judge rejections
+    count (the Q3 exhibit); with judge_only=False any escalation qualifies."""
     return next(
-        (r for r in results if any(s["check"] == "judge" for s in r.escalation_steps)), None
+        (
+            r
+            for r in results
+            if any(s["check"] == "judge" or not judge_only for s in r.escalation_steps)
+        ),
+        None,
     )
 
 
@@ -280,6 +297,8 @@ def describe(result: TaskResult, task_prompt: str) -> str:
     for i, a in enumerate(result.attempts, 1):
         verdict = next((c for c in a.checks if c["name"] == "judge"), None)
         label = "correct" if a.correct else "WRONG" if a.correct is not None else "no answer"
+        if a.truncated:
+            label += ", reply cut off at the token limit"
         lines.append(f"  attempt {i}: {a.model_id} answered {a.answer!r} ({label}) -> {a.action}")
         if verdict:
             lines.append(
@@ -294,3 +313,22 @@ def describe(result: TaskResult, task_prompt: str) -> str:
         f"correct={result.correct}, cost ${result.cost_usd:.6f}"
     )
     return "\n".join(lines)
+
+
+def baseline_costs(records: Sequence[RunRecord], categories: set[str]) -> dict[str, dict]:
+    """What each model costs and achieves on its own, with no judge and no routing, from the
+    profiling run. A fair yardstick for the routed system on the same task types."""
+    grouped: dict[str, list[RunRecord]] = {}
+    for r in records:
+        if r.category in categories:
+            grouped.setdefault(r.model_id, []).append(r)
+    result = {}
+    for model_id, rows in sorted(grouped.items()):
+        wins = sum(r.correct for r in rows)
+        total = sum(r.cost_usd for r in rows)
+        result[model_id] = {
+            "n": len(rows),
+            "success": _rate(wins, len(rows)),
+            "cost_per_success_usd": total / wins if wins else None,
+        }
+    return result

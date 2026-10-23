@@ -268,7 +268,7 @@ def test_cli_end_to_end_skips_profiled_tasks_and_writes_the_report(tmp_path, mon
     monkeypatch.setenv("GEMINI_API_KEY", "k")
     monkeypatch.setenv("GROQ_API_KEY", "k")
     monkeypatch.chdir(tmp_path)
-    pool = generate_tasks(40, seed=11)
+    pool = generate_tasks(120, seed=11)
     answers = {t.prompt: t.expected for t in pool}
     seen: list[str] = []
     profiled = pool[0]
@@ -300,3 +300,75 @@ def test_cli_end_to_end_skips_profiled_tasks_and_writes_the_report(tmp_path, mon
     report = json.loads((tmp_path / "live_routing_trace.json").read_text())
     assert report["summary"]["tasks"] == 5 and len(report["tasks"]) == 5
     assert profiled.prompt not in seen
+
+
+def test_cli_can_focus_on_some_task_types_and_label_its_output(tmp_path, monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "k")
+    monkeypatch.setenv("GROQ_API_KEY", "k")
+    monkeypatch.chdir(tmp_path)
+    answers = {t.prompt: t.expected for t in generate_tasks(120, seed=11)}
+
+    def respond(model, messages):
+        if "strict evaluator" in messages[0].content:
+            return '{"pass": true, "reason": "ok"}'
+        return answers[messages[1].content]
+
+    monkeypatch.setattr(
+        trace_cli,
+        "build_default_client",
+        lambda settings, timeout_s: LLMClient(MockBackend(responder=respond)),
+    )
+    monkeypatch.setattr(trace_cli, "Settings", lambda: Settings(_env_file=None))
+
+    trace_cli.main(
+        ["--workers", "gemini-3.5-flash-lite", "gemini-3.8-flash", "--judge", "groq-gpt-oss-120b",
+         "--tasks", "4", "--categories", "coding", "--label", "coding", "--yes",
+         "--rpm", "100000", "--tpm", "100000000", "--out-dir", str(tmp_path)]
+    )  # fmt: skip
+
+    report = json.loads((tmp_path / "live_routing_trace_coding.json").read_text())
+    assert report["categories"] == ["coding"]
+    assert {t["category"] for t in report["tasks"]} == {"coding"} and len(report["tasks"]) == 4
+    assert not (tmp_path / "live_routing_trace.json").exists()
+
+
+def test_first_escalation_can_include_non_judge_escalations():
+    step = {"from_model": "a", "to_model": "b", "check": "format", "reason": "bad shape",
+            "judge_model": None, "independent": None, "wasted_cost_usd": 0.0}  # fmt: skip
+    escalated = TaskResult("t", "h", "coding", "easy", "low", "proven", "", False, [],
+                           [step], "b", True, True, 0.0, 0.0)  # fmt: skip
+
+    assert first_escalation([escalated]) is None
+    assert first_escalation([escalated], judge_only=False) is escalated
+
+
+async def test_replies_that_use_the_whole_token_budget_are_flagged(tmp_path):
+    cheap, mid, judge = models()
+    client = guarded(lambda m, msgs: "9" * 400)
+    log = TraceLog(tmp_path / "t.jsonl")
+
+    results = await run_trace(
+        TASKS[:2], [cheap, mid], judge, client, CapabilityRegistry(), log,
+        risk=RiskLevel.LOW, max_output_tokens=1, say=lambda _m: None,
+    )  # fmt: skip
+
+    assert any(a.truncated for r in results for a in r.attempts)
+    assert summarise_trace(results)["truncated_attempts"] > 0
+
+
+def test_baselines_show_each_model_alone_on_the_same_task_types():
+    from app.profiling.trace import baseline_costs
+
+    def rec(model, category, correct, cost):
+        return RunRecord(model, "t", "h", category, "easy", correct, "1", 1, 1, 0.1, cost, False)
+
+    records = [
+        rec("a", "coding", True, 0.001), rec("a", "coding", False, 0.001),
+        rec("a", "reasoning", True, 0.5),
+        rec("b", "coding", True, 0.004),
+    ]  # fmt: skip
+
+    result = baseline_costs(records, {"coding"})
+
+    assert result["a"]["n"] == 2 and result["a"]["cost_per_success_usd"] == pytest.approx(0.002)
+    assert result["b"]["success"]["rate"] == 1.0

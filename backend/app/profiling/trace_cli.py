@@ -10,18 +10,25 @@ profiles in data/live_capability_profiles.json and tasks the profiler never saw.
 import argparse
 import asyncio
 import json
-import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
 from app.benchmark.tasks import generate_tasks
 from app.core.config import Settings
-from app.core.types import RiskLevel
+from app.core.types import RiskLevel, TaskCategory
 from app.llm.client import build_default_client
 from app.profiling.cli import DEFAULT_OUT_DIR, fail, limit_overrides, missing_keys, resolve_models
 from app.profiling.guarded import GuardedClient
 from app.profiling.runner import Guard, RunLog, prompt_hash
-from app.profiling.trace import TraceLog, describe, first_escalation, run_trace, summarise_trace
+from app.profiling.trace import (
+    MAX_OUTPUT_TOKENS,
+    TraceLog,
+    baseline_costs,
+    describe,
+    first_escalation,
+    run_trace,
+    summarise_trace,
+)
 from app.registry.capability import CapabilityRegistry
 from app.registry.catalog import ModelCatalog
 
@@ -32,7 +39,15 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--judge", required=True, help="dedicated judge model (never a worker)")
     parser.add_argument("--tasks", type=int, default=40)
     parser.add_argument("--seed", type=int, default=11, help="differs from the profiling seed")
+    parser.add_argument(
+        "--categories",
+        nargs="+",
+        choices=[c.value for c in TaskCategory],
+        help="only trace these task types (declare this when reporting results)",
+    )
+    parser.add_argument("--label", default="", help="suffix for the output file names")
     parser.add_argument("--risk", choices=[r.value for r in RiskLevel], default="low")
+    parser.add_argument("--max-tokens", type=int, default=MAX_OUTPUT_TOKENS)
     parser.add_argument("--max-cost", type=float, default=0.50, help="notional USD cap")
     parser.add_argument("--max-calls", type=int, default=400)
     parser.add_argument("--rpm", type=int)
@@ -56,8 +71,11 @@ def main(argv: list[str] | None = None) -> None:
 
     profile_log = RunLog(args.out_dir / "live_profile_runs.jsonl")
     profiled = {r.prompt_sha for r in profile_log.load()}
-    candidates = generate_tasks(args.tasks * 2, args.seed)
-    tasks = [t for t in candidates if prompt_hash(t) not in profiled][: args.tasks]
+    wanted = set(args.categories) if args.categories else {c.value for c in TaskCategory}
+    pool = generate_tasks(args.tasks * 12, args.seed)
+    tasks = [t for t in pool if t.category.value in wanted and prompt_hash(t) not in profiled]
+    tasks = tasks[: args.tasks]
+    suffix = f"_{args.label}" if args.label else ""
     registry = CapabilityRegistry()
     profiles_path = args.out_dir / "live_capability_profiles.json"
     if profiles_path.exists():
@@ -85,11 +103,12 @@ def main(argv: list[str] | None = None) -> None:
         guard,
         limits=limit_overrides([*workers, judge], args.rpm, args.tpm),
     )
-    log = TraceLog(args.out_dir / "live_routing_trace.jsonl")
+    log = TraceLog(args.out_dir / f"live_routing_trace{suffix}.jsonl")
     results = asyncio.run(
         run_trace(
             tasks, workers, judge, client, registry, log,
-            risk=RiskLevel(args.risk), stop_reason=lambda: guard.reason,
+            risk=RiskLevel(args.risk), max_output_tokens=args.max_tokens,
+            stop_reason=lambda: guard.reason,
         )
     )  # fmt: skip
 
@@ -97,13 +116,30 @@ def main(argv: list[str] | None = None) -> None:
     print(json.dumps(summary, indent=2))
     prompts = {t.id: t.prompt for t in tasks}
     example = first_escalation(results)
-    print(
-        "\nFirst escalation caused by the judge:"
-        if example
-        else "\nNo judge-driven escalation occurred."
-    )
+    if example:
+        print("\nFirst escalation caused by the judge:")
+    else:
+        example = first_escalation(results, judge_only=False)
+        print(
+            "\nNo judge-driven escalation occurred."
+            + (" First escalation of another kind:" if example else "")
+        )
     if example:
         print(describe(example, prompts[example.task_id]))
+
+    own = [r for r in profile_log.load() if r.model_id in set(args.workers)]
+    baselines = baseline_costs(own, wanted)
+    print("\nFor comparison, each worker alone with no judge (profiling run, same task types):")
+    for model_id, b in baselines.items():
+        cps = b["cost_per_success_usd"]
+        print(
+            f"  {model_id}: {b['success']['hits']}/{b['n']} correct, ${cps:.6f} per success"
+            if cps
+            else f"  {model_id}: no correct answers"
+        )
+    cps = summary["cost_per_success_usd"]
+    if cps:
+        print(f"  routed system with judge: ${cps:.6f} per success")
 
     report = {
         "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
@@ -111,11 +147,14 @@ def main(argv: list[str] | None = None) -> None:
         "judge": args.judge,
         "risk": args.risk,
         "seed": args.seed,
+        "categories": sorted(wanted),
+        "max_tokens": args.max_tokens,
+        "baselines": baselines,
         "summary": summary,
         "tasks": [r.__dict__ | {"attempts": [a.__dict__ for a in r.attempts]} for r in results],
     }
-    (args.out_dir / "live_routing_trace.json").write_text(json.dumps(report, indent=2))
-    print(f"\nWrote {args.out_dir / 'live_routing_trace.json'}", file=sys.stdout)
+    (args.out_dir / f"live_routing_trace{suffix}.json").write_text(json.dumps(report, indent=2))
+    print(f"\nWrote {args.out_dir / f'live_routing_trace{suffix}.json'}")
 
 
 if __name__ == "__main__":
